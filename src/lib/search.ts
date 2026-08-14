@@ -204,8 +204,3 @@ export function search(query: string): SearchResult {
     unmatched,
   };
 }
-
-/** Shops of one category, for the chips under the box. */
-export function byCategory(key: string): Shop[] {
-  return SHOPS.filter((s) => s.category === key);
-}

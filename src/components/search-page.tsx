@@ -1,15 +1,9 @@
 "use client";
 
 import { useDeferredValue, useMemo, useRef, useState } from "react";
-import {
-  MapPin,
-  Phone,
-  Search,
-  X,
-  type LucideIcon,
-} from "lucide-react";
+import { MapPin, Phone, Search, X, type LucideIcon } from "lucide-react";
 import * as Icons from "lucide-react";
-import { CATEGORIES, CITY_NAMES, SHOPS, type Shop } from "@/lib/data";
+import { CATEGORIES, CITY_NAMES, type Shop } from "@/lib/data";
 import { search } from "@/lib/search";
 import { BrandMark } from "./brand-mark";
 
@@ -19,82 +13,72 @@ function iconFor(name: string): LucideIcon {
   return set[name] ?? Icons.Store;
 }
 
-const WA = (n?: string) => (n ? `https://wa.me/${n}` : undefined);
-
+/**
+ * The whole site.
+ *
+ * One field and the answers to it — no category tiles, no browse-by-this,
+ * nothing to choose from before you have said what you want. The only hint
+ * offered is the placeholder inside the box, because that is part of the box
+ * rather than an alternative to using it.
+ */
 export function SearchPage() {
   const [query, setQuery] = useState("");
-  const [activeCat, setActiveCat] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Keeps typing smooth: the field updates immediately, the (heavier) result
-  // list is allowed to lag a frame behind rather than blocking the keystroke.
+  // Keeps typing smooth: the field updates on the keystroke, the heavier
+  // result list is allowed to land a frame later.
   const deferred = useDeferredValue(query);
+  const typed = query.trim().length > 0;
 
-  const result = useMemo(() => {
-    if (deferred.trim()) return search(deferred);
-    if (activeCat)
-      return {
-        shops: SHOPS.filter((s) => s.category === activeCat),
-        category: CATEGORIES.find((c) => c.key === activeCat),
-        city: undefined,
-        unmatched: [],
-      };
-    return null;
-  }, [deferred, activeCat]);
-
-  const searching = Boolean(query.trim() || activeCat);
-
-  function clear() {
-    setQuery("");
-    setActiveCat(null);
-    inputRef.current?.focus();
-  }
+  const result = useMemo(
+    () => (deferred.trim() ? search(deferred) : null),
+    [deferred],
+  );
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-4 pb-16">
-      {/* masthead — small once you are searching, so results get the screen */}
       <div
         className={`flex flex-col items-center text-center transition-all duration-500 ${
-          searching ? "pt-8 pb-5" : "pt-[18vh] pb-8"
+          typed ? "pt-8 pb-5" : "pt-[22vh] pb-9"
         }`}
       >
-        <BrandMark className={searching ? "size-11" : "size-16"} />
+        <BrandMark className={typed ? "size-11" : "size-16"} />
         <h1
           className={`mt-3 font-extrabold tracking-tight text-primary transition-all duration-500 dark:text-foreground ${
-            searching ? "text-xl" : "text-3xl sm:text-4xl"
+            typed ? "text-xl" : "text-3xl sm:text-4xl"
           }`}
         >
           دووکان
         </h1>
-        {!searching && (
+        {!typed && (
           <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground sm:max-w-sm">
             هەر شتێکت دەوێت بینووسە — دووکانەکەی بۆ دەدۆزینەوە.
           </p>
         )}
       </div>
 
-      {/* the box the whole site is built around */}
       <div className="search-shell sticky top-3 z-20 flex items-center gap-2 rounded-2xl border-2 border-border bg-card px-3.5 shadow-sm">
         <Search className="size-5 shrink-0 text-muted-foreground" aria-hidden />
         <input
           ref={inputRef}
           value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setActiveCat(null);
-          }}
+          onChange={(e) => setQuery(e.target.value)}
           type="search"
           inputMode="search"
           enterKeyHint="search"
           autoComplete="off"
+          autoFocus
           aria-label="بگەڕێ بۆ دووکان"
           placeholder="مۆبایل، گوڵ، دەرمانخانە…"
           className="h-14 w-full bg-transparent text-base outline-none placeholder:text-muted-foreground/70"
         />
-        {searching && (
+        {typed && (
           <button
             type="button"
-            onClick={clear}
+            onClick={() => {
+              setQuery("");
+              inputRef.current?.focus();
+            }}
             aria-label="سڕینەوە"
             className="grid size-9 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
@@ -103,32 +87,6 @@ export function SearchPage() {
         )}
       </div>
 
-      {/* the shortcuts, while nothing is typed */}
-      {!searching && (
-        <div className="mt-6">
-          <p className="mb-3 text-xs font-semibold text-muted-foreground">
-            یان یەکێک هەڵبژێرە
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {CATEGORIES.map((c) => {
-              const Icon = iconFor(c.icon);
-              return (
-                <button
-                  key={c.key}
-                  type="button"
-                  onClick={() => setActiveCat(c.key)}
-                  className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-2 text-sm font-medium transition-colors hover:border-gold hover:bg-accent"
-                >
-                  <Icon className="size-4 shrink-0 text-gold" aria-hidden />
-                  {c.label.ku}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* results */}
       {result && (
         <div className="mt-5">
           <p className="mb-3 text-xs text-muted-foreground">
@@ -139,7 +97,10 @@ export function SearchPage() {
                 </span>{" "}
                 دووکان
                 {result.category && (
-                  <> لە <span className="text-gold">{result.category.label.ku}</span></>
+                  <>
+                    {" "}
+                    لە <span className="text-gold">{result.category.label.ku}</span>
+                  </>
                 )}
                 {result.city && <> لە {CITY_NAMES[result.city].ku}</>}
               </>
@@ -149,7 +110,13 @@ export function SearchPage() {
           </p>
 
           {result.shops.length === 0 ? (
-            <EmptyState onPick={(k) => { setQuery(""); setActiveCat(k); }} />
+            <div className="rounded-2xl border border-dashed border-border p-8 text-center">
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                هیچ دووکانێک بەم ناوە نەدۆزرایەوە.
+                <br />
+                بە شێوەیەکی تر بینووسە، یان ناوی شارەکەشی لەگەڵ بنووسە.
+              </p>
+            </div>
           ) : (
             <ul className="grid gap-2.5">
               {result.shops.map((shop, i) => (
@@ -166,7 +133,7 @@ export function SearchPage() {
 function ShopCard({ shop, index }: { shop: Shop; index: number }) {
   const cat = CATEGORIES.find((c) => c.key === shop.category);
   const Icon = iconFor(cat?.icon ?? "Store");
-  const wa = WA(shop.whatsapp);
+  const wa = shop.whatsapp ? `https://wa.me/${shop.whatsapp}` : undefined;
 
   return (
     <li
@@ -212,28 +179,5 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
         )}
       </div>
     </li>
-  );
-}
-
-/** A dead end that offers a way out rather than an apology. */
-function EmptyState({ onPick }: { onPick: (key: string) => void }) {
-  return (
-    <div className="rounded-2xl border border-dashed border-border p-6 text-center">
-      <p className="text-sm text-muted-foreground">
-        ئەو شتە نەدۆزرایەوە. لەوانەیە بەم شێوەیە نەنووسرابێت — ئەمانە تاقی بکەرەوە:
-      </p>
-      <div className="mt-4 flex flex-wrap justify-center gap-2">
-        {CATEGORIES.slice(0, 6).map((c) => (
-          <button
-            key={c.key}
-            type="button"
-            onClick={() => onPick(c.key)}
-            className="rounded-full border border-border bg-card px-3 py-1.5 text-sm transition-colors hover:border-gold hover:bg-accent"
-          >
-            {c.label.ku}
-          </button>
-        ))}
-      </div>
-    </div>
   );
 }
