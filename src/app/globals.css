@@ -79,19 +79,153 @@
   }
 }
 
-/* The search field is the whole product, so its focus ring is designed
-   rather than inherited. */
-.search-shell {
-  transition:
-    box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 220ms,
-    transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+/* ── The field ────────────────────────────────────────────────────────────
+   This site is one box on an empty page, so the box has to carry the whole
+   thing. Left plain it reads as unfinished — as though the rest of the page
+   failed to load. Lit and moving, it reads as the point.
+
+   Three layers: a colour that turns behind the glass, an aura under it that
+   breathes, and the field itself sitting on top. */
+
+.field {
+  position: relative;
+  isolation: isolate;
 }
-.search-shell:focus-within {
-  border-color: color-mix(in oklch, var(--gold) 70%, transparent);
-  box-shadow:
-    0 0 0 4px color-mix(in oklch, var(--gold) 18%, transparent),
-    0 18px 40px -18px color-mix(in oklch, var(--primary) 45%, transparent);
+
+/* the turning colour, showing only as a hairline around the field */
+.field-ring {
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  overflow: hidden;
+  z-index: -2;
+}
+.field-ring::before {
+  content: "";
+  position: absolute;
+  /* wider than the box so the cone's seam never crosses a visible edge */
+  inset: -140%;
+  background: conic-gradient(
+    from 0deg,
+    #dfb250,
+    #f0cd8a,
+    #e8825a,
+    #b06ab3,
+    #4f8ff0,
+    #34c4a8,
+    #dfb250
+  );
+  animation: field-turn 7s linear infinite;
+}
+@keyframes field-turn {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* the same colour again, blurred, as the light it throws on the page */
+.field-aura {
+  position: absolute;
+  inset: 2px 10px;
+  border-radius: inherit;
+  z-index: -3;
+  background: conic-gradient(
+    from 0deg,
+    #dfb250,
+    #e8825a,
+    #b06ab3,
+    #4f8ff0,
+    #34c4a8,
+    #dfb250
+  );
+  filter: blur(22px);
+  opacity: 0.5;
+  animation:
+    field-turn 7s linear infinite,
+    field-breathe 4.5s ease-in-out infinite;
+}
+@keyframes field-breathe {
+  0%,
+  100% {
+    opacity: 0.38;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* the glass the text sits on, covering all but the hairline */
+.field-inner {
+  border-radius: inherit;
+  background: var(--card);
+  transition: box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.field:focus-within .field-inner {
+  box-shadow: 0 16px 40px -20px color-mix(in oklch, var(--primary) 55%, transparent);
+}
+/* leaning in: the colour speeds up and the light swells */
+.field:focus-within .field-ring::before,
+.field:focus-within .field-aura {
+  animation-duration: 2.6s, 4.5s;
+}
+.field:focus-within .field-aura {
+  opacity: 0.85;
+  filter: blur(26px);
+}
+
+/* Colour drifting behind the whole page, so the field is not the only thing
+   alive on it. */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  pointer-events: none;
+  opacity: 0.5;
+}
+@keyframes orb-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(8%, 10%, 0) scale(1.2);
+  }
+}
+@keyframes orb-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1.15);
+  }
+  50% {
+    transform: translate3d(-10%, -8%, 0) scale(0.9);
+  }
+}
+.orb-a {
+  animation: orb-a 19s ease-in-out infinite;
+}
+.orb-b {
+  animation: orb-b 24s ease-in-out infinite;
+}
+
+/* The example word inside the box, changing so the field suggests what it can
+   answer without a row of buttons doing it instead. */
+@keyframes hint-cycle {
+  0%,
+  22% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  30%,
+  92% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.hint {
+  animation: hint-cycle 2.6s ease-in-out;
 }
 
 @keyframes pop-in {
@@ -109,6 +243,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .field-ring::before,
+  .field-aura,
+  .orb-a,
+  .orb-b,
+  .hint {
+    animation: none;
+  }
   .pop-in {
     animation: none;
   }

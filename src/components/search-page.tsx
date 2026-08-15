@@ -22,10 +22,33 @@ function iconFor(name: string): LucideIcon {
  * offered is the placeholder inside the box, because that is part of the box
  * rather than an alternative to using it.
  */
+/** What the empty field offers, one at a time. */
+const HINTS = [
+  "مۆبایل…",
+  "گوڵفرۆش…",
+  "دەرمانخانە…",
+  "چێشتخانە…",
+  "زێڕفرۆش…",
+  "مێکانیکی…",
+];
+
 export function SearchPage() {
   const [query, setQuery] = useState("");
   const [shops, setShops] = useState<Shop[]>(SHOPS);
+  const [hintIndex, setHintIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const hint = HINTS[hintIndex];
+
+  // Only while the field is empty — once someone is typing, a word appearing
+  // and vanishing underneath them is noise.
+  useEffect(() => {
+    if (query) return;
+    const id = setInterval(
+      () => setHintIndex((i) => (i + 1) % HINTS.length),
+      2600,
+    );
+    return () => clearInterval(id);
+  }, [query]);
 
   // Start on the seed so the first paint can already search, then swap in the
   // real shops once they arrive. Nothing blocks on the network: a visitor who
@@ -54,7 +77,44 @@ export function SearchPage() {
   );
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-4 pb-16">
+    <main className="relative mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-4 pb-16">
+      {/* Colour drifting behind everything. Clipped to the viewport so it can
+          sit outside the column without widening the page. */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <span
+          className="orb orb-a"
+          style={{
+            width: "26rem",
+            height: "26rem",
+            top: "-6rem",
+            insetInlineEnd: "-8rem",
+            background: "#dfb250",
+          }}
+        />
+        <span
+          className="orb orb-b"
+          style={{
+            width: "22rem",
+            height: "22rem",
+            bottom: "-6rem",
+            insetInlineStart: "-7rem",
+            background: "#4f8ff0",
+          }}
+        />
+        <span
+          className="orb orb-a"
+          style={{
+            width: "18rem",
+            height: "18rem",
+            top: "38%",
+            insetInlineStart: "-5rem",
+            background: "#b06ab3",
+            opacity: 0.32,
+            animationDelay: "-7s",
+          }}
+        />
+      </div>
+
       <div
         className={`flex flex-col items-center text-center transition-all duration-500 ${
           typed ? "pt-8 pb-5" : "pt-[22vh] pb-9"
@@ -75,34 +135,50 @@ export function SearchPage() {
         )}
       </div>
 
-      <div className="search-shell sticky top-3 z-20 flex items-center gap-2 rounded-2xl border-2 border-border bg-card px-3.5 shadow-sm">
-        <Search className="size-5 shrink-0 text-muted-foreground" aria-hidden />
-        <input
-          ref={inputRef}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          type="search"
-          inputMode="search"
-          enterKeyHint="search"
-          autoComplete="off"
-          autoFocus
-          aria-label="بگەڕێ بۆ دووکان"
-          placeholder="مۆبایل، گوڵ، دەرمانخانە…"
-          className="h-14 w-full bg-transparent text-base outline-none placeholder:text-muted-foreground/70"
-        />
-        {typed && (
-          <button
-            type="button"
-            onClick={() => {
-              setQuery("");
-              inputRef.current?.focus();
-            }}
-            aria-label="سڕینەوە"
-            className="grid size-9 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          >
-            <X className="size-4" />
-          </button>
-        )}
+      <div className="field sticky top-3 z-20 rounded-2xl">
+        <span aria-hidden className="field-aura" />
+        <span aria-hidden className="field-ring" />
+        <div className="field-inner flex items-center gap-2 px-3.5">
+          <Search className="size-5 shrink-0 text-muted-foreground" aria-hidden />
+          <div className="relative w-full">
+            <input
+              ref={inputRef}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              type="search"
+              inputMode="search"
+              enterKeyHint="search"
+              autoComplete="off"
+              aria-label="بگەڕێ بۆ دووکان"
+              className="h-16 w-full bg-transparent text-base outline-none"
+            />
+            {/* Standing in for the placeholder so one example can fade into
+                the next. A real placeholder cannot animate. */}
+            {!query && (
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-y-0 start-0 flex items-center text-base text-muted-foreground/70"
+              >
+                <span key={hint} className="hint">
+                  {hint}
+                </span>
+              </span>
+            )}
+          </div>
+          {typed && (
+            <button
+              type="button"
+              onClick={() => {
+                setQuery("");
+                inputRef.current?.focus();
+              }}
+              aria-label="سڕینەوە"
+              className="grid size-9 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              <X className="size-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       {result && (
