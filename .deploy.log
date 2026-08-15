@@ -1,0 +1,11 @@
+<claude-code-hint v="1" type="plugin" value="vercel@claude-plugins-official" />
+Vercel CLI 58.8.0 (Node.js 24.18.0)
+Deploying dukan
+Uploading [--------------------] (0.0B/249.4KB)
+Uploading [=====---------------] (74.0KB/249.4KB)
+Uploading [==========----------] (126.7KB/249.4KB)
+Uploading [===============-----] (190.7KB/249.4KB)
+Uploading [====================] (249.4KB/249.4KB)
+  Inspect         https://vercel.com/mohammed01/dukan/EaauWY4BBo5ri1TKvP446HqBwAbw
+  Production      https://dukan-4siu9vaw4-mohammed01.vercel.app
+Building…

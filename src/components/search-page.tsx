@@ -78,43 +78,6 @@ export function SearchPage() {
 
   return (
     <main className="relative mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-4 pb-16">
-      {/* Colour drifting behind everything. Clipped to the viewport so it can
-          sit outside the column without widening the page. */}
-      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <span
-          className="orb orb-a"
-          style={{
-            width: "26rem",
-            height: "26rem",
-            top: "-6rem",
-            insetInlineEnd: "-8rem",
-            background: "#dfb250",
-          }}
-        />
-        <span
-          className="orb orb-b"
-          style={{
-            width: "22rem",
-            height: "22rem",
-            bottom: "-6rem",
-            insetInlineStart: "-7rem",
-            background: "#4f8ff0",
-          }}
-        />
-        <span
-          className="orb orb-a"
-          style={{
-            width: "18rem",
-            height: "18rem",
-            top: "38%",
-            insetInlineStart: "-5rem",
-            background: "#b06ab3",
-            opacity: 0.32,
-            animationDelay: "-7s",
-          }}
-        />
-      </div>
-
       <div
         className={`flex flex-col items-center text-center transition-all duration-500 ${
           typed ? "pt-8 pb-5" : "pt-[22vh] pb-9"
