@@ -80,101 +80,51 @@
 }
 
 /* ── The field ────────────────────────────────────────────────────────────
-   This site is one box on an empty page, so the box has to carry the whole
-   thing. Left plain it reads as unfinished — as though the rest of the page
-   failed to load. Lit and moving, it reads as the point.
-
-   Three layers: a colour that turns behind the glass, the same colour blurred
-   and lifted above it as the light it throws, and the field on top. */
+   Quiet now. The turning light around it did its job while the page was
+   otherwise bare; with a picture behind the page, a second moving thing
+   competes with it. A clean edge and a shadow are enough to lift the box off
+   whatever is behind it. */
 
 .field {
   position: relative;
   isolation: isolate;
 }
 
-/* the turning colour, showing only as a hairline around the field */
-.field-ring {
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  overflow: hidden;
-  z-index: -2;
-}
-.field-ring::before {
-  content: "";
-  position: absolute;
-  /* wider than the box so the cone's seam never crosses a visible edge */
-  inset: -140%;
-  /* Gold only. The earlier version ran through red, violet and blue, and
-     blurred underneath it that came out as a pink stain across the page —
-     nothing like a lit edge. Staying inside one hue and moving through its
-     light and dark reads as metal catching the light instead. */
-  background: conic-gradient(
-    from 0deg,
-    #a8762a,
-    #dfb250,
-    #fff3d6,
-    #f0cd8a,
-    #c9932f,
-    #fbe6b4,
-    #a8762a
-  );
-  animation: field-turn 9s linear infinite;
-}
-@keyframes field-turn {
-  to {
-    transform: rotate(1turn);
-  }
-}
-
 /*
- * The light the field throws — the same colour again, blurred.
+ * White, deliberately, on a navy page.
  *
- * Steady rather than breathing: a glow that swells and fades pulls the eye
- * away from the words being typed. It holds one brightness and only turns.
+ * Everything else here follows the dark palette, but the field is the one
+ * thing a visitor has come to use — a dark box on a dark ground would sink
+ * into the arcade behind it. White makes it the only lit surface on the page,
+ * which is exactly the emphasis this site wants.
  *
- * Lifted, too. The inset leaves more room above the field than below, so the
- * light reads as coming from over the box rather than pooling under it like
- * a shadow.
+ * That means the text inside cannot inherit the page's light foreground, so
+ * the colours are set here rather than left to the tokens.
  */
-.field-aura {
-  position: absolute;
-  inset: -12px 12px 6px;
-  border-radius: inherit;
-  z-index: -3;
-  background: conic-gradient(
-    from 0deg,
-    #dfb250,
-    #f0cd8a,
-    #e8b45a,
-    #dfb250,
-    #f5d9a0,
-    #dfb250
-  );
-  filter: blur(24px);
-  opacity: 0.45;
-  animation: field-turn 9s linear infinite;
-}
-
-/* the glass the text sits on, covering all but the hairline */
 .field-inner {
   border-radius: inherit;
-  background: var(--card);
-  transition: box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1);
+  background: #ffffff;
+  color: #15304a;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  box-shadow: 0 14px 36px -16px rgba(0, 0, 0, 0.55);
+  transition:
+    box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 200ms;
+}
+.field-inner input {
+  color: #15304a;
+}
+/* The cycling example word and the icons beside it. Dark enough to clear
+   4.5:1 on white — the lighter grey that looked right came out at 3.6. */
+.field-inner .hint,
+.field-inner svg {
+  color: #62708a;
 }
 .field:focus-within .field-inner {
-  box-shadow: 0 16px 40px -20px color-mix(in oklch, var(--primary) 55%, transparent);
-}
-/* leaning in: the colour speeds up and the light swells. One duration, not
-   two — each of these now runs a single animation, and the second value was
-   being dropped on the floor. */
-.field:focus-within .field-ring::before,
-.field:focus-within .field-aura {
-  animation-duration: 3.4s;
-}
-.field:focus-within .field-aura {
-  opacity: 0.85;
-  filter: blur(26px);
+  border-color: rgba(223, 178, 80, 0.85);
+  box-shadow:
+    0 0 0 4px rgba(223, 178, 80, 0.28),
+    0 18px 44px -16px rgba(0, 0, 0, 0.6);
 }
 
 /* The example word inside the box, changing so the field suggests what it can
@@ -213,8 +163,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .field-ring::before,
-  .field-aura,
   .hint {
     animation: none;
   }

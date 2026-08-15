@@ -99,8 +99,6 @@ export function SearchPage() {
       </div>
 
       <div className="field sticky top-3 z-20 rounded-2xl">
-        <span aria-hidden className="field-aura" />
-        <span aria-hidden className="field-ring" />
         <div className="field-inner flex items-center gap-2 px-3.5">
           <Search className="size-5 shrink-0 text-muted-foreground" aria-hidden />
           <div className="relative w-full">

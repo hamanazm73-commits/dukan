@@ -21,13 +21,13 @@ export const metadata: Metadata = {
   applicationName: "دووکان",
 };
 
-export const viewport: Viewport = { themeColor: "#15304A" };
+export const viewport: Viewport = { themeColor: "#0b1c2e" };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ku" dir="rtl" suppressHydrationWarning>
+    <html lang="ku" dir="rtl" className="dark" suppressHydrationWarning>
       <body className={`${sans.variable} ${arabic.variable} min-h-dvh`}>
         {children}
       </body>
