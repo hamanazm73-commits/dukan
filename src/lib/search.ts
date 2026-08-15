@@ -18,9 +18,13 @@ import { allowedEdits, normalize, tokens, withinEdits } from "./normalize";
  * shop with "mobile" in its name. So a query is matched against the category
  * vocabulary first, and a hit there returns the whole category.
  *
- * Everything is prepared once at module load and matched in memory. With a
- * few thousand shops that is far faster than a round trip, and it means
- * results appear while the keyboard is still open.
+ * Everything is prepared once and matched in memory. With a few thousand
+ * shops that is far faster than a round trip, and it means results appear
+ * while the keyboard is still open.
+ *
+ * The index is built from whatever list it is handed rather than from the
+ * seed, because the shops that matter come from Firestore and change while
+ * the site is running.
  */
 
 /** A shop with everything searchable flattened and normalized. */
@@ -32,7 +36,8 @@ interface Indexed {
   words: Set<string>;
 }
 
-const INDEX: Indexed[] = SHOPS.map((shop) => {
+function buildIndex(shops: Shop[]): Indexed[] {
+  return shops.map((shop) => {
   const cat = CATEGORIES.find((c) => c.key === shop.category);
   const names = [shop.name.ku, shop.name.ar, shop.name.en].map(normalize);
 
@@ -52,7 +57,8 @@ const INDEX: Indexed[] = SHOPS.map((shop) => {
   cat?.terms.forEach(add);
 
   return { shop, names, words };
-});
+  });
+}
 
 /** Category vocabulary, normalized once. */
 const CATEGORY_TERMS: { cat: Category; terms: string[] }[] = CATEGORIES.map(
@@ -105,7 +111,22 @@ export interface SearchResult {
   unmatched: string[];
 }
 
-export function search(query: string): SearchResult {
+/**
+ * Bind a search to one set of shops.
+ *
+ * The index costs something to build, so it is built once per list and reused
+ * across every keystroke — rebuilding it inside `search` would redo the work
+ * on every letter typed.
+ */
+export function createSearcher(shops: Shop[]) {
+  const index = buildIndex(shops);
+  return (query: string): SearchResult => runSearch(query, index);
+}
+
+/** The seed searcher, for anything rendered before live shops arrive. */
+export const search = createSearcher(SHOPS);
+
+function runSearch(query: string, INDEX: Indexed[]): SearchResult {
   const qs = tokens(query);
   if (!qs.length) return { shops: [], unmatched: [] };
 

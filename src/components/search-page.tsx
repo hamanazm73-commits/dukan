@@ -1,10 +1,11 @@
 "use client";
 
-import { useDeferredValue, useMemo, useRef, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { MapPin, Phone, Search, X, type LucideIcon } from "lucide-react";
 import * as Icons from "lucide-react";
-import { CATEGORIES, CITY_NAMES, type Shop } from "@/lib/data";
-import { search } from "@/lib/search";
+import { CATEGORIES, CITY_NAMES, SHOPS, type Shop } from "@/lib/data";
+import { createSearcher } from "@/lib/search";
+import { loadShops } from "@/lib/shops-repo";
 import { BrandMark } from "./brand-mark";
 
 /** Category icons are named in the data; resolve them once. */
@@ -23,7 +24,24 @@ function iconFor(name: string): LucideIcon {
  */
 export function SearchPage() {
   const [query, setQuery] = useState("");
+  const [shops, setShops] = useState<Shop[]>(SHOPS);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Start on the seed so the first paint can already search, then swap in the
+  // real shops once they arrive. Nothing blocks on the network: a visitor who
+  // types immediately still gets an answer.
+  useEffect(() => {
+    let cancelled = false;
+    void loadShops().then((r) => {
+      if (!cancelled) setShops(r.shops);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Built once per shop list, not once per keystroke.
+  const searcher = useMemo(() => createSearcher(shops), [shops]);
 
   // Keeps typing smooth: the field updates on the keystroke, the heavier
   // result list is allowed to land a frame later.
@@ -31,8 +49,8 @@ export function SearchPage() {
   const typed = query.trim().length > 0;
 
   const result = useMemo(
-    () => (deferred.trim() ? search(deferred) : null),
-    [deferred],
+    () => (deferred.trim() ? searcher(deferred) : null),
+    [deferred, searcher],
   );
 
   return (
