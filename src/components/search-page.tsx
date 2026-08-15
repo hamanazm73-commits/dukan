@@ -84,15 +84,22 @@ export function SearchPage() {
         }`}
       >
         <BrandMark className={typed ? "size-11" : "size-16"} />
+
+        {/* Ruqaa sets very narrow: at 48px this name measured 110px across a
+            375px screen, which reads as small however large the number looks.
+            The sizes are chosen against the rendered width, not the font size.
+            No `tracking-tight` either — that is drawn for Latin and presses
+            Kurdish letters into each other. */}
         <h1
-          className={`mt-3 font-extrabold tracking-tight text-primary transition-all duration-500 dark:text-foreground ${
-            typed ? "text-xl" : "text-3xl sm:text-4xl"
+          className={`text-gold-gradient gold-sweep mt-3 font-[family-name:var(--font-display)] leading-[1.45] transition-all duration-500 ${
+            typed ? "text-4xl" : "text-[4rem] sm:text-[5.5rem]"
           }`}
         >
           دووکان
         </h1>
+
         {!typed && (
-          <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground sm:max-w-sm">
+          <p className="mt-1 max-w-xs text-lg font-normal leading-relaxed text-white/70 sm:max-w-sm sm:text-xl">
             هەر شتێکت دەوێت بینووسە — دووکانەکەی بۆ دەدۆزینەوە.
           </p>
         )}

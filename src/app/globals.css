@@ -79,6 +79,41 @@
   }
 }
 
+/* ── The name ─────────────────────────────────────────────────────────────
+   Lifted from the parent site so the two names are the same gold in the same
+   hand. It paints by making the text transparent and clipping a gradient to
+   the glyphs. */
+.text-gold-gradient {
+  background: linear-gradient(
+    100deg,
+    #b8862f 0%,
+    #f0cd8a 42%,
+    #fff3d6 52%,
+    #f0cd8a 62%,
+    #b8862f 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Must come after the rule above: that one sets `background`, the shorthand,
+   which resets background-size to auto. With the gradient exactly filling the
+   text there would be nothing for the highlight to travel across. */
+.text-gold-gradient.gold-sweep {
+  background-size: 250% 100%;
+  animation: gold-sweep 7s ease-in-out infinite;
+}
+@keyframes gold-sweep {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
 /* ── The field ────────────────────────────────────────────────────────────
    Quiet now. The turning light around it did its job while the page was
    otherwise bare; with a picture behind the page, a second moving thing
@@ -163,6 +198,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .text-gold-gradient.gold-sweep,
   .hint {
     animation: none;
   }
