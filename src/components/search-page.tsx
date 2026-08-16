@@ -135,7 +135,13 @@ export function SearchPage() {
           typed ? "pt-8 pb-5" : "pt-0 pb-12"
         }`}
       >
-        <BrandMark className={typed ? "size-11" : "size-16 sm:size-20"} />
+        {/* The four things arrive in order — mark, name, line, field — so the
+            page reads as opening rather than as having always been there.
+            Only on the way in: once anyone types, the block is moving to the
+            top and a second animation on top of that is noise. */}
+        <BrandMark
+          className={`${typed ? "size-11" : "arrive-mark size-16 sm:size-20"}`}
+        />
 
         {/* Ruqaa sets very narrow: at 48px this name measured 110px across a
             375px screen, which reads as small however large the number looks.
@@ -149,20 +155,27 @@ export function SearchPage() {
             ten pixels top and bottom. */}
         <h1
           className={`text-gold-gradient gold-sweep mt-4 text-balance font-[family-name:var(--font-display)] leading-[1.6] transition-all duration-500 ${
-            typed ? "text-3xl" : "text-[2.9rem] sm:text-[4.2rem]"
+            typed ? "text-3xl" : "arrive text-[2.9rem] sm:text-[4.2rem]"
           }`}
+          style={typed ? undefined : { animationDelay: "160ms" }}
         >
           بازاڕی لای حەمە
         </h1>
 
         {!typed && (
-          <p className="mt-3 max-w-xs text-balance text-lg font-normal leading-relaxed text-white/55 sm:max-w-md sm:text-xl">
+          <p
+            className="arrive mt-3 max-w-xs text-balance text-lg font-normal leading-relaxed text-white/55 sm:max-w-md sm:text-xl"
+            style={{ animationDelay: "300ms" }}
+          >
             نووسین لە تۆ، گەڕان و دۆزینەوە لە ئێمە
           </p>
         )}
       </div>
 
-      <div className="field sticky top-3 z-20 rounded-2xl">
+      <div
+        className={`field sticky top-3 z-20 rounded-2xl ${typed ? "" : "arrive"}`}
+        style={typed ? undefined : { animationDelay: "440ms" }}
+      >
         <div className="field-inner flex items-center gap-2 px-3.5">
           <Search className="size-5 shrink-0 text-muted-foreground" aria-hidden />
           <div className="relative w-full">
