@@ -153,14 +153,19 @@ export function SearchPage() {
             below the line and high heads above it: at 1.35 the glyphs wanted
             73px and the line box gave them 63, so the name was being cut by
             ten pixels top and bottom. */}
-        <h1
-          className={`text-gold-gradient gold-sweep mt-4 text-balance font-[family-name:var(--font-display)] leading-[1.6] transition-all duration-500 ${
-            typed ? "text-3xl" : "arrive text-[2.9rem] sm:text-[4.2rem]"
-          }`}
-          style={typed ? undefined : { animationDelay: "160ms" }}
-        >
-          بازاڕی لای حەمە
-        </h1>
+        {/* The arrival goes on a wrapper, not on the heading. The heading
+            already carries `gold-sweep`, and a second `animation` on the same
+            element replaces it rather than joining it — the name was landing
+            with no fade at all and the sweep was inheriting the delay. */}
+        <div className={typed ? "" : "arrive"} style={typed ? undefined : { animationDelay: "160ms" }}>
+          <h1
+            className={`text-gold-gradient gold-sweep mt-4 text-balance font-[family-name:var(--font-display)] leading-[1.6] transition-all duration-500 ${
+              typed ? "text-3xl" : "text-[2.9rem] sm:text-[4.2rem]"
+            }`}
+          >
+            بازاڕی لای حەمە
+          </h1>
+        </div>
 
         {!typed && (
           <p
