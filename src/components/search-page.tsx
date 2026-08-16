@@ -133,9 +133,13 @@ export function SearchPage() {
           it, the shade is poured only here, under the text, and fades out
           before it reaches an edge.
         */}
+        {/* Held inside the column. A negative horizontal inset put it past
+            the viewport edge and gave the page a sideways scroll — the
+            gradient fades out on its own, so it never needed the extra
+            width to look soft. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -inset-x-8 -bottom-2 -top-6 [background:radial-gradient(ellipse_58%_52%_at_50%_50%,rgba(6,10,16,0.78),transparent_72%)]"
+          className="pointer-events-none absolute inset-x-0 -bottom-2 -top-6 [background:radial-gradient(ellipse_78%_52%_at_50%_50%,rgba(6,10,16,0.78),transparent_74%)]"
         />
 
         <BrandMark
