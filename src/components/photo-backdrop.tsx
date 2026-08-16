@@ -20,20 +20,32 @@ import { useEffect, useRef } from "react";
 /** One lamp: where it hangs, how large it burns, how brightly. */
 type Lamp = [x: number, y: number, r: number, a: number];
 
-/** The near string — larger, brighter, and it travels furthest. */
+/**
+ * The near string — larger, brighter, and it travels furthest.
+ *
+ * Strung along the top and the bottom with only a pair out at the sides.
+ * The band through the middle is left to the far string and the vignette,
+ * because that is where the name and the field stand.
+ */
 const NEAR: Lamp[] = [
-  [8, 18, 5, 0.5], [21, 11, 3.4, 0.38], [34, 22, 6, 0.42], [47, 9, 4, 0.5],
-  [61, 19, 5.4, 0.36], [74, 12, 3.6, 0.46], [88, 24, 5, 0.4],
-  [5, 74, 4.4, 0.34], [26, 84, 5.6, 0.3], [44, 77, 3.8, 0.4],
-  [66, 86, 5, 0.32], [83, 72, 4.2, 0.38], [95, 88, 3.4, 0.3],
+  [6, 16, 7, 0.5], [15, 9, 5, 0.42], [24, 20, 7.5, 0.46], [33, 11, 5.5, 0.5],
+  [42, 21, 6.5, 0.4], [51, 8, 5, 0.52], [60, 18, 7, 0.44], [69, 10, 5.5, 0.48],
+  [78, 22, 6.5, 0.4], [87, 13, 5, 0.5], [95, 20, 6, 0.42],
+  [4, 76, 6, 0.38], [14, 88, 5, 0.32], [25, 79, 7, 0.36], [36, 90, 5.5, 0.3],
+  [47, 78, 6.5, 0.38], [58, 89, 5, 0.32], [69, 80, 6.5, 0.36],
+  [80, 91, 5.5, 0.3], [90, 77, 6, 0.36], [97, 86, 4.5, 0.3],
+  [3, 42, 5.5, 0.34], [96, 48, 5.5, 0.32],
 ];
 
 /** The far string — smaller, fainter, and it barely moves. */
 const FAR: Lamp[] = [
-  [14, 34, 2.4, 0.26], [29, 44, 2, 0.2], [41, 33, 2.6, 0.24],
-  [55, 46, 2.2, 0.18], [69, 35, 2.8, 0.22], [80, 47, 2, 0.2],
-  [92, 38, 2.4, 0.24], [3, 55, 2.2, 0.18], [18, 63, 2.6, 0.2],
-  [52, 62, 2.4, 0.16], [76, 60, 2.2, 0.2], [90, 66, 2.6, 0.18],
+  [10, 30, 3.2, 0.26], [20, 38, 2.8, 0.22], [30, 29, 3.4, 0.24],
+  [40, 40, 3, 0.2], [50, 31, 3.2, 0.22], [60, 41, 2.8, 0.2],
+  [70, 30, 3.4, 0.24], [80, 40, 3, 0.22], [90, 32, 3.2, 0.24],
+  [97, 42, 2.8, 0.2], [7, 58, 3, 0.22], [17, 66, 3.2, 0.2],
+  [28, 57, 2.8, 0.18], [39, 67, 3, 0.2], [50, 58, 2.6, 0.16],
+  [61, 68, 3, 0.18], [72, 57, 3.2, 0.2], [83, 67, 2.8, 0.18],
+  [93, 59, 3, 0.2], [12, 50, 2.6, 0.18], [88, 52, 2.6, 0.18],
 ];
 
 /** A whole string as one background shorthand, one radial stop per lamp. */
@@ -91,11 +103,11 @@ export function PhotoBackdrop() {
             past a focused foreground rather than dots on a screen, and two
             of them drifting at different speeds is what gives it depth. */}
         <div
-          className="lamps-far absolute inset-0 blur-[3px]"
+          className="lamps-far absolute inset-0 blur-[4px]"
           style={{ background: lampsToCss(FAR) }}
         />
         <div
-          className="lamps-near absolute inset-0 blur-[6px]"
+          className="lamps-near absolute inset-0 blur-[8px]"
           style={{ background: lampsToCss(NEAR) }}
         />
       </div>
