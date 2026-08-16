@@ -22,14 +22,22 @@ function iconFor(name: string): LucideIcon {
  * offered is the placeholder inside the box, because that is part of the box
  * rather than an alternative to using it.
  */
-/** What the empty field offers, one at a time. */
+/**
+ * What the empty field offers, one at a time.
+ *
+ * Things, not shop types. Nobody wakes up wanting "a florist" — they want
+ * red roses, and the shop is only how they get them. Showing "گوڵفرۆش" here
+ * taught people to search the way the database is filed; showing "گوڵی سوور"
+ * teaches them to search the way they already think.
+ */
 const HINTS = [
-  "مۆبایل…",
-  "گوڵفرۆش…",
-  "دەرمانخانە…",
-  "چێشتخانە…",
-  "زێڕفرۆش…",
-  "مێکانیکی…",
+  "ئایفۆن ١٧…",
+  "گوڵی سوور…",
+  "دەرمانی سەرئێشە…",
+  "کەبابی برژاو…",
+  "ئەڵقەی زەماوەند…",
+  "تایەی ئۆتۆمبێل…",
+  "کێکی ساڵیاد…",
 ];
 
 export function SearchPage() {

@@ -28,6 +28,8 @@ export const CATEGORIES: Category[] = [
       "موبايل", "موبايلات", "شحن", "شارژ", "کێبڵ", "سکرین", "قاب",
       "mobile", "mobil", "mobayl", "phone", "telefon", "smartphone", "iphone",
       "samsung", "charger", "case", "screen",
+      // the goods themselves — what a customer types, not the trade
+      "ئایفۆن", "ایفون", "ئایفۆن ١٧", "iphone 17", "galaxy", "گەلاکسی", "شاشە", "سکرین", "پاوەربانک", "هێدفۆن", "سماعة", "بەتری مۆبایل", "سیمکارت", "خط",
     ],
   },
   {
@@ -38,6 +40,8 @@ export const CATEGORIES: Category[] = [
       "گوڵ", "گول", "گوڵفرۆش", "گوڵفروش", "دەستەگوڵ", "باخچە",
       "ورد", "ورود", "زهور", "بوكيه", "باقة",
       "flower", "flowers", "florist", "gul", "gull", "rose", "bouquet",
+      // the goods themselves — what a customer types, not the trade
+      "گوڵی سوور", "گولی سور", "ورد احمر", "گوڵی سپی", "ڕۆز", "روز", "باقة", "دەستەگوڵی بووک", "گوڵی زەماوەند", "سەبەتەی گوڵ", "red rose", "bouquet",
     ],
   },
   {
@@ -48,6 +52,8 @@ export const CATEGORIES: Category[] = [
       "دەرمانخانە", "درمانخانه", "دەرمان", "درمان", "ئەژنە",
       "صيدلية", "صيدليه", "دواء", "ادوية",
       "pharmacy", "darmanxane", "derman", "medicine", "drug", "chemist",
+      // the goods themselves — what a customer types, not the trade
+      "دەرمانی سەرئێشە", "سەرئێشە", "پاراسیتامۆل", "بەنادۆڵ", "panadol", "paracetamol", "ڤیتامین", "فيتامين", "شەربەت", "کرێمی پێست", "حبوب", "دەرمانی هەوکردن",
     ],
   },
   {
@@ -58,6 +64,8 @@ export const CATEGORIES: Category[] = [
       "چێشتخانە", "چیشتخانه", "چێشت", "خواردن", "کەباب", "کباب", "برگر",
       "مطعم", "مطاعم", "اكل", "طعام", "برجر", "شاورما",
       "restaurant", "chishtxane", "kebab", "burger", "food", "shawarma", "pizza",
+      // the goods themselves — what a customer types, not the trade
+      "کەبابی برژاو", "کەباب", "برنج", "دۆڵمە", "پیتزا", "برگر", "شاورما", "تکە", "مەندی", "قوزی", "بریانی",
     ],
   },
   {
@@ -68,6 +76,8 @@ export const CATEGORIES: Category[] = [
       "نانەوا", "نانەواخانە", "نان", "سەمون", "شیرینی", "کێک",
       "مخبز", "خبز", "صمون", "حلويات", "كيك",
       "bakery", "nan", "bread", "samoon", "cake", "sweets", "pastry",
+      // the goods themselves — what a customer types, not the trade
+      "نانی تەندوور", "سەمون", "کێکی ساڵیاد", "کێک", "شیرینی", "بەقلاوە", "کولێرە", "تۆرتە", "cake", "خبز تنور",
     ],
   },
   {
@@ -78,6 +88,8 @@ export const CATEGORIES: Category[] = [
       "جل", "جلوبەرگ", "جلوبەرگی", "کراس", "پانتۆڵ", "جلی کوردی", "بۆکس",
       "ملابس", "ملبس", "قميص", "بنطرون", "دشداشة",
       "clothes", "clothing", "jl", "shirt", "trousers", "fashion", "boutique",
+      // the goods themselves — what a customer types, not the trade
+      "کراسی کوردی", "جلی کوردی", "پانتۆڵ", "جاکێت", "تیشێرت", "شاڵ", "کراوات", "عەبا", "دشداشة",
     ],
   },
   {
@@ -88,6 +100,8 @@ export const CATEGORIES: Category[] = [
       "پێڵاو", "پیلاو", "پێڵاوفرۆش", "سۆڵ", "قوندەرە",
       "حذاء", "احذية", "قندرة", "صندل",
       "shoes", "shoe", "pelaw", "sandal", "boots", "sneakers",
+      // the goods themselves — what a customer types, not the trade
+      "پێڵاوی وەرزشی", "سەندەڵ", "بووت", "قوندەرەی فەرمی", "سنیکەر", "حذاء رياضي", "کەوش",
     ],
   },
   {
@@ -98,6 +112,8 @@ export const CATEGORIES: Category[] = [
       "ئەلیکترۆنی", "الیکترۆنیات", "تەلەڤیزیۆن", "تلفزیون", "ساردکەرەوە",
       "ثلاجة", "غسالة", "تلفزيون", "الكترونيات", "مكيف",
       "electronics", "tv", "fridge", "washing machine", "ac", "laptop",
+      // the goods themselves — what a customer types, not the trade
+      "تەلەڤیزیۆن", "ساردکەرەوە", "جلشۆر", "مایکرۆوەیڤ", "لاپتۆپ", "پرینتەر", "مکیف", "سبلت", "فرن", "کاولەر",
     ],
   },
   {
@@ -108,6 +124,8 @@ export const CATEGORIES: Category[] = [
       "مۆبیلیا", "موبیلیا", "کەلوپەل", "قەنەفە", "مێز", "کورسی", "جێخەو",
       "اثاث", "مفروشات", "كنب", "سرير", "طاولة",
       "furniture", "mobilia", "sofa", "bed", "table", "chair",
+      // the goods themselves — what a customer types, not the trade
+      "قەنەفە", "جێخەو", "مێزی خواردن", "دۆڵابی جل", "کورسی", "دۆشەک", "پەردە", "سەت مۆبیلیا", "سرير",
     ],
   },
   {
@@ -118,6 +136,8 @@ export const CATEGORIES: Category[] = [
       "سوپەرمارکێت", "سوپەر", "بەقاڵ", "دووکانی خۆراک", "مارکێت",
       "سوبر ماركت", "بقالة", "ماركت", "تسوق",
       "supermarket", "market", "grocery", "baqal", "shop",
+      // the goods themselves — what a customer types, not the trade
+      "برنج", "شەکر", "ڕۆن", "ماست", "شیر", "تەماتە", "ئارد", "چای", "قاوە",
     ],
   },
   {
@@ -128,6 +148,8 @@ export const CATEGORIES: Category[] = [
       "سەرتاشخانە", "سەرتاش", "قژ", "قژبڕین", "ساڵۆن",
       "حلاق", "حلاقة", "صالون", "قص شعر",
       "barber", "sartash", "haircut", "salon", "hair",
+      // the goods themselves — what a customer types, not the trade
+      "قژبڕین", "ڕیشتاشین", "سەرتاشین", "ڕەنگکردنی قژ", "قص شعر",
     ],
   },
   {
@@ -138,6 +160,8 @@ export const CATEGORIES: Category[] = [
       "زێڕ", "زیڕ", "زێڕفرۆش", "ئاڵتون", "خشڵ", "ئەڵقە",
       "ذهب", "صائغ", "مجوهرات", "الماس", "خاتم",
       "gold", "zer", "jewellery", "jewelry", "jeweller", "ring", "diamond",
+      // the goods themselves — what a customer types, not the trade
+      "ئەڵقەی زەماوەند", "ئەڵقە", "خشڵ", "زنجیر", "دەستبەند", "گوارە", "خاتم", "سلسلة",
     ],
   },
   {
@@ -148,6 +172,8 @@ export const CATEGORIES: Category[] = [
       "مێکانیکی", "میکانیکی", "ئۆتۆمبێل", "سەیارە", "تایە", "بەنزین", "کارواش",
       "ميكانيكي", "سيارة", "تاير", "كراج", "بنجرچي", "غسيل سيارات",
       "mechanic", "car", "tyre", "tire", "garage", "carwash", "mikaniki",
+      // the goods themselves — what a customer types, not the trade
+      "تایە", "بەتری", "زەیت", "فلتەر", "کارواش", "سایلەنسەر", "تاير", "بطارية", "زيت",
     ],
   },
   {
@@ -158,6 +184,8 @@ export const CATEGORIES: Category[] = [
       "کەرەستە", "بیناسازی", "چیمەنتۆ", "بۆیە", "ئامێر", "میخ", "دار",
       "مواد انشائية", "اسمنت", "صبغ", "عدة", "حديد",
       "hardware", "cement", "paint", "tools", "construction", "timber",
+      // the goods themselves — what a customer types, not the trade
+      "چیمەنتۆ", "بۆیە", "میخ", "دار", "کاشی", "لوولە", "وایەر", "سمنت", "صبغ",
     ],
   },
   {
@@ -168,6 +196,8 @@ export const CATEGORIES: Category[] = [
       "قەرتاسیە", "نووسینگە", "پێنووس", "دەفتەر", "کتێب", "چاپ", "فۆتۆکۆپی",
       "قرطاسية", "قلم", "دفتر", "كتاب", "طباعة", "استنساخ",
       "stationery", "pen", "notebook", "book", "print", "copy",
+      // the goods themselves — what a customer types, not the trade
+      "دەفتەر", "پێنووس", "فۆتۆکۆپی", "چاپکردن", "کاغەز", "فایل", "دفتر", "قلم",
     ],
   },
   {
@@ -178,6 +208,8 @@ export const CATEGORIES: Category[] = [
       "بۆن", "بون", "بۆنفرۆش", "عەتر", "جوانکاری", "مەکیاج",
       "عطر", "عطور", "مكياج", "تجميل",
       "perfume", "bon", "cosmetics", "makeup", "beauty",
+      // the goods themselves — what a customer types, not the trade
+      "عەتر", "بۆنی پیاوان", "بۆنی ژنان", "مەکیاج", "کرێم", "لیپستیک", "عطر رجالي", "مكياج",
     ],
   },
 ];
