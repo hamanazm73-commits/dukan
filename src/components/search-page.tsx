@@ -132,11 +132,11 @@ export function SearchPage() {
             No `tracking-tight` either — that is drawn for Latin and presses
             Kurdish letters into each other. */}
         <h1
-          className={`text-gold-gradient gold-sweep mt-3 font-[family-name:var(--font-display)] leading-[1.45] transition-all duration-500 ${
-            typed ? "text-4xl" : "text-[4rem] sm:text-[5.5rem]"
+          className={`text-gold-gradient gold-sweep mt-3 text-balance font-[family-name:var(--font-display)] leading-[1.35] transition-all duration-500 ${
+            typed ? "text-3xl" : "text-[2.9rem] sm:text-[4.2rem]"
           }`}
         >
-          دووکان
+          بازاڕی لای حەمە
         </h1>
 
         {!typed && (

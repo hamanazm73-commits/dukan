@@ -26,14 +26,14 @@ const display = Aref_Ruqaa({
   weight: ["400", "700"],
 });
 
-const TITLE = "دووکان — هەر شتێک دەتەوێت، دووکانەکەی بدۆزەرەوە";
+const TITLE = "بازاڕی لای حەمە — بینووسە، بیدۆزەرەوە";
 const DESCRIPTION =
   "مۆبایل، گوڵ، دەرمانخانە، چێشتخانە — بنووسە چیت دەوێت و دووکانەکەی لە هەولێر، سلێمانی، دهۆک و هەموو شارەکانی کوردستان بدۆزەرەوە.";
 
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
-  applicationName: "دووکان",
+  applicationName: "بازاڕی لای حەمە",
 };
 
 export const viewport: Viewport = { themeColor: "#0b1c2e" };
