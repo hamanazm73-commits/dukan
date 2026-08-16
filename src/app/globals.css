@@ -115,10 +115,9 @@
 }
 
 /* ── The field ────────────────────────────────────────────────────────────
-   Quiet now. The turning light around it did its job while the page was
-   otherwise bare; with a picture behind the page, a second moving thing
-   competes with it. A clean edge and a shadow are enough to lift the box off
-   whatever is behind it. */
+   The one thing on the page. Everything that used to surround it — the
+   photograph, the lamps, the weave — is gone, so this and the name are all
+   a visitor is given, and the turning light is the only motion left. */
 
 .field {
   position: relative;
@@ -128,10 +127,9 @@
 /*
  * White, deliberately, on a navy page.
  *
- * Everything else here follows the dark palette, but the field is the one
- * thing a visitor has come to use — a dark box would sink into the darkened
- * photograph behind it. White makes it the only lit surface on the page,
- * which is exactly the emphasis this site wants.
+ * Everything else here follows the dark palette. The field is the one thing
+ * a visitor came to use, and white makes it the only lit surface on an
+ * otherwise empty screen — which is the whole emphasis of the site.
  *
  * That means the text inside cannot inherit the page's light foreground, so
  * the colours are set here rather than left to the tokens.
@@ -215,8 +213,8 @@
  *
  * Not a border with a colour on it — a wedge of light on a disc turning
  * behind the field, of which only the sliver past the inner panel's edge is
- * ever visible. The 1.5px of padding is the whole border: the panel covers
- * the rest of the disc, and `overflow: hidden` keeps it inside the rounded
+ * ever visible. The padding below is the whole border: the panel covers the
+ * rest of the disc, and `overflow: hidden` keeps it inside the rounded
  * corners. The `isolation` already on `.field` is what lets the disc sit at
  * z-index -1 without dropping behind the page itself.
  */
@@ -250,30 +248,10 @@
   z-index: -1;
 }
 
-/*
- * The two strings of lamps, breathing.
- *
- * Different durations and different distances, so the near string and the
- * far one never fall into step — in step they read as one flat sheet
- * sliding, which is the opposite of depth. Slow enough that nobody watching
- * the page catches it moving; they only notice it is not still.
- */
-@keyframes lamps-near {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.95; }
-  50%      { transform: translate3d(-1.4%, 1.1%, 0) scale(1.04); opacity: 1; }
-}
-@keyframes lamps-far {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1.02); opacity: 0.8; }
-  50%      { transform: translate3d(1%, -0.8%, 0) scale(1); opacity: 0.95; }
-}
-.lamps-near { animation: lamps-near 26s ease-in-out infinite; }
-.lamps-far { animation: lamps-far 34s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   .text-gold-gradient.gold-sweep,
-  .hint,
-  .lamps-near,
-  .lamps-far {
+  .hint {
     animation: none;
   }
   .pop-in {
