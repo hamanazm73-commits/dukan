@@ -5,16 +5,20 @@ import { useEffect, useRef } from "react";
 /**
  * The bazaar at night, behind the whole page.
  *
- * Drawn rather than photographed. What was here was a fine picture and a
- * poor backdrop: a man looking straight down the lens, sitting exactly where
- * the name and the field sit, in a portrait crop that a wide screen cut down
- * to its busiest part. A face is the strongest thing on any page, and a
- * backdrop has to stay behind.
+ * An empty alley strung with bulbs, made for this page rather than found:
+ * nobody in it, dark through the middle where the name and the field stand,
+ * and warm at the edges. It measures 52 of 255 through the centre band
+ * before the wash goes on, against roughly 100 as the point white text
+ * starts to struggle.
  *
- * So: strung lights out of focus over a warm dark. A few bytes instead of
- * 350KB, the same picture at every size and crop, nobody in it to license,
- * and the middle deliberately empty so the text always has somewhere clean
- * to stand.
+ * It arrived square, which is the one shape a page is never. Rather than
+ * crop a square to a laptop's middle band — which would have cut off the
+ * lights along the top — it was widened to 16:9 by mirroring and blurring
+ * its own edges outward, so the picture keeps everything it had. 59KB.
+ *
+ * The drawn lamps stay over it, faint. A photograph cannot move; those can,
+ * and two of them breathing at different rates is what keeps a still page
+ * from looking stopped.
  */
 
 /** One lamp: where it hangs, how large it burns, how brightly. */
@@ -99,25 +103,42 @@ export function PhotoBackdrop() {
         ref={ref}
         className="absolute left-[-6%] top-[-6%] h-[112%] w-[112%] will-change-transform"
       >
-        {/* Two strings at two depths. The blur is what makes them lamps seen
-            past a focused foreground rather than dots on a screen, and two
-            of them drifting at different speeds is what gives it depth. */}
+        {/*
+          The photograph.
+
+          Bled 6% past every edge by the wrapper so the parallax never
+          exposes a corner, and sized outright — an <img> is a replaced
+          element, so insets alone would leave it at the file's own size
+          instead of filling the box.
+        */}
+        <img
+          src="/bazaar.webp"
+          alt=""
+          fetchPriority="high"
+          className="size-full object-cover"
+        />
+
+        {/* The drawn lamps stay, faint, over the photograph. They are what
+            keeps the frame alive on a still page — the picture cannot move
+            on its own, and these breathe at two different rates. */}
         <div
-          className="lamps-far absolute inset-0 blur-[4px]"
+          className="lamps-far absolute inset-0 opacity-40 blur-[4px]"
           style={{ background: lampsToCss(FAR) }}
         />
         <div
-          className="lamps-near absolute inset-0 blur-[8px]"
+          className="lamps-near absolute inset-0 opacity-30 blur-[8px]"
           style={{ background: lampsToCss(NEAR) }}
         />
       </div>
 
-      {/* The middle is kept clear on purpose: the name and the field stand
-          there, and a lamp behind a letter is a lamp in the way. */}
-      <div className="absolute inset-0 [background:radial-gradient(ellipse_62%_44%_at_50%_44%,transparent,rgba(10,7,4,0.92)_74%)]" />
+      {/* Lighter than it was over the drawn version. That one needed a heavy
+          vignette to clear a hole for the text; the photograph arrives dark
+          through the middle already, and burying it under the same wash
+          would waste the picture. */}
+      <div className="absolute inset-0 [background:radial-gradient(ellipse_70%_50%_at_50%_44%,transparent,rgba(10,7,4,0.55)_82%)]" />
 
-      {/* and the dark the words stand on, heavier top and bottom */}
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,7,4,0.72)_0%,rgba(10,7,4,0.30)_45%,rgba(10,7,4,0.86)_100%)]" />
+      {/* the dark the words stand on, heavier top and bottom */}
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,7,4,0.62)_0%,rgba(10,7,4,0.18)_45%,rgba(10,7,4,0.78)_100%)]" />
 
       {/* a little warmth behind the mark, so the gold has something to sit in */}
       <div className="absolute inset-0 [background:radial-gradient(ellipse_70%_35%_at_50%_26%,rgba(223,178,80,0.14),transparent_70%)]" />
