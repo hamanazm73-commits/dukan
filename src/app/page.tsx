@@ -1,10 +1,10 @@
-import { BazaarBackdrop } from "@/components/bazaar-backdrop";
+import { PhotoBackdrop } from "@/components/photo-backdrop";
 import { SearchPage } from "@/components/search-page";
 
 export default function Home() {
   return (
     <>
-      <BazaarBackdrop />
+      <PhotoBackdrop />
       <SearchPage />
     </>
   );

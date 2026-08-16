@@ -79,6 +79,23 @@
   }
 }
 
+/* ── The photograph behind the page ───────────────────────────────────────
+   A slow drift, thirty seconds each way. The element is placed by inset, so
+   these keyframes carry the drift and nothing else — no centring to restate,
+   and nothing for a utility class to fight over. */
+@keyframes backdrop-drift {
+  from {
+    transform: scale(1) translate(0, 0);
+  }
+  to {
+    transform: scale(1.12) translate(1.4%, -1.4%);
+  }
+}
+.backdrop-drift {
+  animation: backdrop-drift 30s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
 /* ── The name ─────────────────────────────────────────────────────────────
    Lifted from the parent site so the two names are the same gold in the same
    hand. It paints by making the text transparent and clipping a gradient to
@@ -129,8 +146,8 @@
  * White, deliberately, on a navy page.
  *
  * Everything else here follows the dark palette, but the field is the one
- * thing a visitor has come to use — a dark box on a dark ground would sink
- * into the arcade behind it. White makes it the only lit surface on the page,
+ * thing a visitor has come to use — a dark box would sink into the darkened
+ * photograph behind it. White makes it the only lit surface on the page,
  * which is exactly the emphasis this site wants.
  *
  * That means the text inside cannot inherit the page's light foreground, so
@@ -198,6 +215,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .backdrop-drift,
   .text-gold-gradient.gold-sweep,
   .hint {
     animation: none;
