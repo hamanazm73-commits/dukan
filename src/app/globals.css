@@ -197,6 +197,58 @@
   animation: pop-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* The cursor that follows the opening line as it types itself. */
+@keyframes caret-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.caret {
+  display: inline-block;
+  width: 1.5px;
+  height: 1.05em;
+  vertical-align: -0.16em;
+  margin-inline-start: 2px;
+  background: #dfb250;
+  animation: caret-blink 1.05s step-end infinite;
+}
+
+/*
+ * The gold that travels around the field.
+ *
+ * Not a border with a colour on it — a wedge of light on a disc turning
+ * behind the field, of which only the sliver past the inner panel's edge is
+ * ever visible. The 1.5px of padding is the whole border: the panel covers
+ * the rest of the disc, and `overflow: hidden` keeps it inside the rounded
+ * corners. The `isolation` already on `.field` is what lets the disc sit at
+ * z-index -1 without dropping behind the page itself.
+ */
+@keyframes field-turn {
+  to { transform: translate(-50%, -50%) rotate(1turn); }
+}
+.field {
+  padding: 1.5px;
+  overflow: hidden;
+}
+.field::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 240%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background: conic-gradient(
+    from 0deg,
+    transparent 0 60%,
+    rgba(223, 178, 80, 0.55) 74%,
+    #fff3d6 81%,
+    rgba(223, 178, 80, 0.55) 88%,
+    transparent 96% 100%
+  );
+  animation: field-turn 5s linear infinite;
+  z-index: -1;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .text-gold-gradient.gold-sweep,
   .hint {
@@ -204,5 +256,13 @@
   }
   .pop-in {
     animation: none;
+  }
+  .caret {
+    animation: none;
+  }
+  /* A still ring instead of a turning one, so the field keeps its edge. */
+  .field::before {
+    animation: none;
+    background: rgba(223, 178, 80, 0.5);
   }
 }

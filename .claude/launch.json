@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dukan-dev",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$env:Path = 'D:/node-portable/node-v24.18.0-win-x64;' + $env:Path; Set-Location 'D:/OneDrive/Desktop/dukan'; npm run dev -- -p 3030"
+      ],
+      "port": 3030,
+      "autoPort": true
+    }
+  ]
+}

@@ -40,23 +40,56 @@ const HINTS = [
   "کێکی ساڵیاد…",
 ];
 
+/**
+ * The line the field opens with, typed out a letter at a time.
+ *
+ * It says the two halves of the bargain — what to do, and what comes back —
+ * and it fits inside a phone-width field, which the longer sentences that
+ * mean the same thing do not.
+ */
+const OPENING = "بینووسە، بیدۆزەرەوە";
+
 export function SearchPage() {
   const [query, setQuery] = useState("");
   const [shops, setShops] = useState<Shop[]>(SHOPS);
   const [hintIndex, setHintIndex] = useState(0);
+  /** How much of `OPENING` is on screen; -1 once it has finished and the
+      real examples take over. */
+  const [typed_, setTyped_] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-  const hint = HINTS[hintIndex];
+  const opening = typed_ >= 0;
+  const hint = opening ? OPENING.slice(0, typed_) : HINTS[hintIndex];
+
+  // The opening types itself, holds, then hands over to the examples. Anyone
+  // who has asked for less motion gets it whole, immediately.
+  useEffect(() => {
+    if (query || !opening) return;
+    if (
+      typeof matchMedia === "function" &&
+      matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      setTyped_(OPENING.length);
+      const done = setTimeout(() => setTyped_(-1), 3200);
+      return () => clearTimeout(done);
+    }
+    if (typed_ < OPENING.length) {
+      const id = setTimeout(() => setTyped_((n) => n + 1), 85);
+      return () => clearTimeout(id);
+    }
+    const hold = setTimeout(() => setTyped_(-1), 2600);
+    return () => clearTimeout(hold);
+  }, [query, opening, typed_]);
 
   // Only while the field is empty — once someone is typing, a word appearing
   // and vanishing underneath them is noise.
   useEffect(() => {
-    if (query) return;
+    if (query || opening) return;
     const id = setInterval(
       () => setHintIndex((i) => (i + 1) % HINTS.length),
       2600,
     );
     return () => clearInterval(id);
-  }, [query]);
+  }, [query, opening]);
 
   // Start on the seed so the first paint can already search, then swap in the
   // real shops once they arrive. Nothing blocks on the network: a visitor who
@@ -135,8 +168,12 @@ export function SearchPage() {
                 aria-hidden
                 className="pointer-events-none absolute inset-y-0 start-0 flex items-center text-base text-muted-foreground/70"
               >
-                <span key={hint} className="hint">
+                {/* While the opening is still being typed the key must not
+                    change on every letter, or each one restarts the fade and
+                    the line flickers instead of typing. */}
+                <span key={opening ? "opening" : hint} className={opening ? "" : "hint"}>
                   {hint}
+                  {opening && <span className="caret" aria-hidden />}
                 </span>
               </span>
             )}
