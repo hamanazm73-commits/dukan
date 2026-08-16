@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
   Loader2,
@@ -8,11 +8,13 @@ import {
   Lock,
   Pencil,
   Plus,
+  Search,
   Trash2,
   X,
 } from "lucide-react";
 import { CATEGORIES, CITY_NAMES, type CityKey, type Shop } from "@/lib/data";
 import { firebaseEnabled } from "@/lib/firebase";
+import { normalize } from "@/lib/normalize";
 import { useAuth } from "@/lib/auth";
 import {
   createShop,
@@ -166,6 +168,17 @@ function Dashboard({
   const [live, setLive] = useState(false);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Shop | "new" | null>(null);
+  const [filter, setFilter] = useState("");
+  /** The row whose delete is armed, if any. */
+  const [armed, setArmed] = useState<string | null>(null);
+
+  // An armed row disarms itself. Nobody should come back to a screen left
+  // open and find a delete button waiting under their thumb.
+  useEffect(() => {
+    if (!armed) return;
+    const id = setTimeout(() => setArmed(null), 4000);
+    return () => clearTimeout(id);
+  }, [armed]);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -178,6 +191,36 @@ function Dashboard({
   useEffect(() => {
     void refresh();
   }, [refresh]);
+
+  /**
+   * The rows the filter leaves.
+   *
+   * Matched against the same three things a person would remember a shop by
+   * — its name, its city, its trade — rather than only the name. `normalize`
+   * is the one the site's own search uses, so typing here behaves the way
+   * typing on the front page does.
+   */
+  const visible = useMemo(() => {
+    const q = normalize(filter.trim());
+    if (!q) return shops;
+    return shops.filter((s) => {
+      const city = CITY_NAMES[s.city];
+      const cat = CATEGORIES.find((c) => c.key === s.category);
+      return normalize(
+        [
+          s.name.ku,
+          s.name.ar,
+          s.name.en,
+          city?.ku,
+          city?.ar,
+          cat?.label.ku,
+          ...(s.tags ?? []),
+        ]
+          .filter(Boolean)
+          .join(" "),
+      ).includes(q);
+    });
+  }, [shops, filter]);
 
   return (
     <main className="mx-auto w-full max-w-2xl px-4 pb-20 pt-6">
@@ -212,13 +255,43 @@ function Dashboard({
         <Plus className="size-4" /> دووکانێکی نوێ
       </button>
 
+      {/* A filter, not a search. It runs over the list already on screen —
+          the point is to reach one row out of a hundred without scrolling
+          for it, and it matches the name, the city and the category because
+          those are the three things you would remember a shop by. */}
+      {!loading && shops.length > 6 && (
+        <div className="mb-3 flex items-center gap-2 rounded-xl border border-border bg-card px-3">
+          <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+          <input
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            type="search"
+            placeholder="بگەڕێ لە نێو دووکانەکاندا"
+            aria-label="پاڵاوتنی لیستەکە"
+            className="h-11 w-full bg-transparent text-sm outline-none"
+          />
+        </div>
+      )}
+
+      {!loading && (
+        <p className="mb-3 text-xs text-muted-foreground">
+          {filter
+            ? `${visible.length} لە ${shops.length} دووکان`
+            : `${shops.length} دووکان`}
+        </p>
+      )}
+
       {loading ? (
         <div className="grid place-items-center py-10">
           <Loader2 className="size-6 animate-spin text-muted-foreground" />
         </div>
+      ) : visible.length === 0 ? (
+        <p className="rounded-xl border border-border bg-card px-3 py-6 text-center text-sm text-muted-foreground">
+          هیچ دووکانێک بەم ناوە نییە.
+        </p>
       ) : (
         <ul className="grid gap-2">
-          {shops.map((s) => (
+          {visible.map((s) => (
             <li
               key={s.id}
               className="flex items-center gap-3 rounded-xl border border-border bg-card p-3"
@@ -239,17 +312,31 @@ function Dashboard({
                   >
                     <Pencil className="size-3.5" />
                   </button>
-                  <button
-                    onClick={async () => {
-                      if (!confirm(`«${s.name.ku}» بسڕدرێتەوە؟`)) return;
-                      await deleteShop(s.id);
-                      void refresh();
-                    }}
-                    aria-label="سڕینەوە"
-                    className="grid size-9 place-items-center rounded-lg border border-border text-red-600 transition-colors hover:bg-red-50"
-                  >
-                    <Trash2 className="size-3.5" />
-                  </button>
+                  {/* Two presses, not a browser confirm. The dialog is easy
+                      to dismiss without reading and this cannot be undone —
+                      Firestore keeps no copy. Arming the row states the name
+                      in place and steps back on its own after four seconds,
+                      so a stray tap costs nothing. */}
+                  {armed === s.id ? (
+                    <button
+                      onClick={async () => {
+                        setArmed(null);
+                        await deleteShop(s.id);
+                        void refresh();
+                      }}
+                      className="h-9 shrink-0 rounded-lg bg-red-600 px-3 text-xs font-bold text-white"
+                    >
+                      بیسڕەوە
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setArmed(s.id)}
+                      aria-label={`سڕینەوەی ${s.name.ku}`}
+                      className="grid size-9 place-items-center rounded-lg border border-border text-red-600 transition-colors hover:bg-red-50"
+                    >
+                      <Trash2 className="size-3.5" />
+                    </button>
+                  )}
                 </>
               )}
             </li>
