@@ -1,49 +1,75 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
 /**
- * Amedi on its rock, behind the whole page.
+ * The Erbil bazaar, behind the whole page.
  *
- * The photograph drifts — a very slow zoom and pan, thirty seconds each way.
- * Slow enough that nobody watches it move, fast enough that the page never
- * feels like a printed sheet. Anything quicker would pull the eye off the
- * field, which is the only thing here anyone came to use.
+ * Served from this site rather than a photo CDN. The CDN's own parameters
+ * were what made the last one look poor: `cs=tinysrgb` and `auto=compress`
+ * flatten the colour and band the gradients. Downloaded once at full size,
+ * resized to 1800px and encoded as WebP, the whole picture is 350KB and
+ * loses nothing a background needs.
  *
- * It is fixed rather than scrolled, so the picture stays put while the
- * results move over it.
+ * It no longer moves on its own. It shifts as the page is scrolled, a
+ * quarter of the distance the content travels — so the photograph feels like
+ * it sits behind the page rather than being painted on it, and nothing moves
+ * unless the reader moves it.
  */
-
-/** Pexels, free for commercial use. Wide enough to survive the zoom. */
-const PHOTO =
-  "https://images.pexels.com/photos/21972276/pexels-photo-21972276.jpeg?auto=compress&cs=tinysrgb&w=1920";
-
 export function PhotoBackdrop() {
+  const ref = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let frame = 0;
+    const apply = () => {
+      frame = 0;
+      // A quarter of the scroll distance. Any more and the picture outruns
+      // its 6% bleed and shows an edge.
+      el.style.transform = `translate3d(0, ${window.scrollY * -0.25}px, 0)`;
+    };
+    const onScroll = () => {
+      // One write per frame — a scroll event can fire far more often than
+      // the screen refreshes, and each write would force a fresh layout.
+      if (!frame) frame = requestAnimationFrame(apply);
+    };
+
+    apply();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, []);
+
   return (
     <div
       aria-hidden
       className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
     >
       {/*
-        Bled 6% past every edge so the drift never exposes a corner.
+        Bled 6% past every edge so the parallax never exposes a corner.
 
-        Two things this markup is deliberate about. It is offset with
-        left/top rather than centred with a translate, because the keyframes
-        set `transform` themselves — with a centring translate as well the
-        picture ended up a whole frame off to one side, showing only its edge.
-        And the size is stated outright: an <img> is a replaced element, so
-        four insets alone leave it at the file's own 1920×3413 rather than
-        filling the box.
+        Offset with left/top rather than centred with a translate, because
+        the scroll handler owns `transform` — a centring translate as well
+        would put the picture a whole frame off to one side. And the size is
+        stated outright: an <img> is a replaced element, so insets alone
+        leave it at the file's own dimensions instead of filling the box.
       */}
       <img
-        src={PHOTO}
+        ref={ref}
+        src="/bazaar.webp"
         alt=""
         fetchPriority="high"
-        className="backdrop-drift absolute left-[-6%] top-[-6%] h-[112%] w-[112%] max-w-none object-cover"
+        className="absolute left-[-6%] top-[-6%] h-[112%] w-[112%] max-w-none object-cover will-change-transform"
       />
 
-      {/*
-        The dark the words stand on. Heavier at the top and bottom than the
-        middle: the name sits high and the results run low, and both need
-        more cover than the band between them where the photograph shows.
-      */}
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,20,34,0.86)_0%,rgba(8,20,34,0.62)_45%,rgba(8,20,34,0.90)_100%)]" />
+      {/* The dark the words stand on — heavier top and bottom, where the name
+          sits and the results run, than through the middle. */}
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,20,34,0.86)_0%,rgba(8,20,34,0.60)_45%,rgba(8,20,34,0.90)_100%)]" />
 
       {/* a little warmth behind the mark, so the gold has something to sit in */}
       <div className="absolute inset-0 [background:radial-gradient(ellipse_70%_35%_at_50%_26%,rgba(223,178,80,0.13),transparent_70%)]" />

@@ -79,23 +79,6 @@
   }
 }
 
-/* ── The photograph behind the page ───────────────────────────────────────
-   A slow drift, thirty seconds each way. The element is placed by inset, so
-   these keyframes carry the drift and nothing else — no centring to restate,
-   and nothing for a utility class to fight over. */
-@keyframes backdrop-drift {
-  from {
-    transform: scale(1) translate(0, 0);
-  }
-  to {
-    transform: scale(1.12) translate(1.4%, -1.4%);
-  }
-}
-.backdrop-drift {
-  animation: backdrop-drift 30s ease-in-out infinite alternate;
-  will-change: transform;
-}
-
 /* ── The name ─────────────────────────────────────────────────────────────
    Lifted from the parent site so the two names are the same gold in the same
    hand. It paints by making the text transparent and clipping a gradient to
@@ -215,7 +198,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .backdrop-drift,
   .text-gold-gradient.gold-sweep,
   .hint {
     animation: none;
