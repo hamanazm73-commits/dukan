@@ -140,8 +140,8 @@ export function SearchPage() {
         </h1>
 
         {!typed && (
-          <p className="mt-1 max-w-xs text-lg font-normal leading-relaxed text-white/70 sm:max-w-sm sm:text-xl">
-            هەر شتێکت دەوێت بینووسە — دووکانەکەی بۆ دەدۆزینەوە.
+          <p className="mt-1 max-w-xs text-balance text-lg font-normal leading-relaxed text-white/70 sm:max-w-md sm:text-xl">
+            نووسین لە تۆ، گەڕان و دۆزینەوە لە ئێمە
           </p>
         )}
       </div>
