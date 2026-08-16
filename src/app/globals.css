@@ -249,9 +249,30 @@
   z-index: -1;
 }
 
+/*
+ * The two strings of lamps, breathing.
+ *
+ * Different durations and different distances, so the near string and the
+ * far one never fall into step — in step they read as one flat sheet
+ * sliding, which is the opposite of depth. Slow enough that nobody watching
+ * the page catches it moving; they only notice it is not still.
+ */
+@keyframes lamps-near {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.95; }
+  50%      { transform: translate3d(-1.4%, 1.1%, 0) scale(1.04); opacity: 1; }
+}
+@keyframes lamps-far {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1.02); opacity: 0.8; }
+  50%      { transform: translate3d(1%, -0.8%, 0) scale(1); opacity: 0.95; }
+}
+.lamps-near { animation: lamps-near 26s ease-in-out infinite; }
+.lamps-far { animation: lamps-far 34s ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
   .text-gold-gradient.gold-sweep,
-  .hint {
+  .hint,
+  .lamps-near,
+  .lamps-far {
     animation: none;
   }
   .pop-in {
