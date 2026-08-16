@@ -120,19 +120,38 @@ export function SearchPage() {
   return (
     <main className="relative mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-4 pb-16">
       <div
-        className={`flex flex-col items-center text-center transition-all duration-500 ${
-          typed ? "pt-8 pb-5" : "pt-[22vh] pb-9"
+        className={`relative flex flex-col items-center text-center transition-all duration-500 ${
+          typed ? "pt-8 pb-5" : "pt-[16vh] pb-12"
         }`}
       >
-        <BrandMark className={typed ? "size-11" : "size-16"} />
+        {/*
+          A pool of dark under the words.
+
+          The photograph is dark on average and bright exactly where the
+          lamps hang — which is where the name lands. Gold on gold bokeh has
+          no contrast at all. Rather than darken the whole picture and lose
+          it, the shade is poured only here, under the text, and fades out
+          before it reaches an edge.
+        */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -inset-x-8 -bottom-2 -top-6 [background:radial-gradient(ellipse_58%_52%_at_50%_50%,rgba(6,10,16,0.78),transparent_72%)]"
+        />
+
+        <BrandMark
+          className={`relative ${typed ? "size-11" : "size-16 sm:size-20"}`}
+        />
 
         {/* Ruqaa sets very narrow: at 48px this name measured 110px across a
             375px screen, which reads as small however large the number looks.
             The sizes are chosen against the rendered width, not the font size.
             No `tracking-tight` either — that is drawn for Latin and presses
-            Kurdish letters into each other. */}
+            Kurdish letters into each other.
+
+            The shadow is doing real work over a photograph: it separates the
+            gold from whatever lamp happens to sit behind a letter. */}
         <h1
-          className={`text-gold-gradient gold-sweep mt-3 text-balance font-[family-name:var(--font-display)] leading-[1.35] transition-all duration-500 ${
+          className={`text-gold-gradient gold-sweep relative mt-4 text-balance font-[family-name:var(--font-display)] leading-[1.35] drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)] transition-all duration-500 ${
             typed ? "text-3xl" : "text-[2.9rem] sm:text-[4.2rem]"
           }`}
         >
@@ -140,7 +159,7 @@ export function SearchPage() {
         </h1>
 
         {!typed && (
-          <p className="mt-1 max-w-xs text-balance text-lg font-normal leading-relaxed text-white/70 sm:max-w-md sm:text-xl">
+          <p className="relative mt-3 max-w-xs text-balance text-lg font-normal leading-relaxed text-white/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.8)] sm:max-w-md sm:text-xl">
             نووسین لە تۆ، گەڕان و دۆزینەوە لە ئێمە
           </p>
         )}

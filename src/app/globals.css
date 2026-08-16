@@ -140,11 +140,10 @@
   border-radius: inherit;
   background: #ffffff;
   color: #15304a;
-  border: 1px solid rgba(15, 23, 42, 0.14);
+  /* No hairline. The turning gold outside this panel is the edge; a dark
+     line drawn over it is what made the gold impossible to see. */
   box-shadow: 0 14px 36px -16px rgba(0, 0, 0, 0.55);
-  transition:
-    box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 200ms;
+  transition: box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .field-inner input {
   color: #15304a;
@@ -156,7 +155,6 @@
   color: #62708a;
 }
 .field:focus-within .field-inner {
-  border-color: rgba(223, 178, 80, 0.85);
   box-shadow:
     0 0 0 4px rgba(223, 178, 80, 0.28),
     0 18px 44px -16px rgba(0, 0, 0, 0.6);
@@ -226,7 +224,10 @@
   to { transform: translate(-50%, -50%) rotate(1turn); }
 }
 .field {
-  padding: 1.5px;
+  /* 3px, not 1.5. At a pixel and a half the gold was there and turning and
+     nobody could see it — and the panel's own dark hairline sat on top of
+     what little showed. The hairline is gone; this ring is the edge now. */
+  padding: 3px;
   overflow: hidden;
 }
 .field::before {
