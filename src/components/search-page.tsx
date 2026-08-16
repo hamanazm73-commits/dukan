@@ -127,7 +127,7 @@ export function SearchPage() {
      */
     <main
       className={`relative mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-4 pb-16 transition-all duration-500 ${
-        typed ? "justify-start" : "justify-center pb-[18vh]"
+        typed ? "justify-start" : "justify-center pb-[26vh]"
       }`}
     >
       <div
@@ -141,9 +141,14 @@ export function SearchPage() {
             375px screen, which reads as small however large the number looks.
             The sizes are chosen against the rendered width, not the font size.
             No `tracking-tight` either — that is drawn for Latin and presses
-            Kurdish letters into each other. */}
+            Kurdish letters into each other.
+
+            leading-[1.6], not 1.35. Ruqaa is a written hand with long tails
+            below the line and high heads above it: at 1.35 the glyphs wanted
+            73px and the line box gave them 63, so the name was being cut by
+            ten pixels top and bottom. */}
         <h1
-          className={`text-gold-gradient gold-sweep mt-4 text-balance font-[family-name:var(--font-display)] leading-[1.35] transition-all duration-500 ${
+          className={`text-gold-gradient gold-sweep mt-4 text-balance font-[family-name:var(--font-display)] leading-[1.6] transition-all duration-500 ${
             typed ? "text-3xl" : "text-[2.9rem] sm:text-[4.2rem]"
           }`}
         >
