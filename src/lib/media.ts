@@ -1,15 +1,16 @@
 /**
- * Where a stored photograph is actually served from.
+ * Where a stored photograph is served from.
  *
- * Records keep the key inside the bucket — `shops/abc123.webp` — not a full
- * URL, so the host can change without rewriting every shop. Anything that
- * already looks like a URL is passed through untouched, which is what makes
- * it safe to call on a field that might hold either.
+ * Records keep the key inside the bucket — `shops/abc123.webp` — never a
+ * full URL, and it is served back through this site's own /api/img. That
+ * means the bucket stays private, its address never appears on a page, and
+ * the host behind it can change without touching a single record.
+ *
+ * Anything that already looks like a URL passes through untouched, which is
+ * what makes this safe to call on a field that might hold either.
  */
-const PUBLIC = (process.env.NEXT_PUBLIC_S3_PUBLIC_URL || "").replace(/\/+$/, "");
-
-export function mediaSrc(key: string): string {
+export function mediaSrc(key: string | undefined): string {
   if (!key) return "";
-  if (/^(https?:|data:|blob:|\/)/i.test(key)) return key;
-  return PUBLIC ? `${PUBLIC}/${key}` : key;
+  if (/^(https?:|data:|blob:)/i.test(key)) return key;
+  return `/api/img/${key.replace(/^\/+/, "")}`;
 }
