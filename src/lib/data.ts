@@ -244,6 +244,16 @@ export interface Shop {
   whatsapp?: string;
   /** words specific to this shop — brands it carries, what it is known for */
   tags?: string[];
+  /** Key of the photograph in the bucket, not a full URL. The host it is
+      served from can then change without rewriting every record. */
+  photo?: string;
+  /** Whatever the owner pasted from a maps app. Stored as given and only
+      ever opened, never parsed — every maps app writes a different shape. */
+  mapUrl?: string;
+  /** "09:00" and "22:00". One pair for every day: a shop that keeps
+      different hours on a Friday is a problem worth having later. */
+  opensAt?: string;
+  closesAt?: string;
 }
 
 /**

@@ -13,7 +13,8 @@ import {
   X,
 } from "lucide-react";
 import { CATEGORIES, CITY_NAMES, type CityKey, type Shop } from "@/lib/data";
-import { firebaseEnabled } from "@/lib/firebase";
+import { firebaseEnabled, getAuthOrNull } from "@/lib/firebase";
+import { mediaSrc } from "@/lib/media";
 import { normalize } from "@/lib/normalize";
 import { useAuth } from "@/lib/auth";
 import {
@@ -379,6 +380,10 @@ function ShopForm({
           phone: initial.phone,
           whatsapp: initial.whatsapp ?? "",
           tags: initial.tags ?? [],
+          photo: initial.photo,
+          mapUrl: initial.mapUrl,
+          opensAt: initial.opensAt,
+          closesAt: initial.closesAt,
         }
       : { ...EMPTY, name: { ku: "", ar: "", en: "" }, tags: [] },
   );
@@ -401,6 +406,10 @@ function ShopForm({
         phone: d.phone.trim(),
         whatsapp: d.whatsapp?.trim() || "",
         tags: (d.tags ?? []).map((t) => t.trim()).filter(Boolean),
+        photo: d.photo || "",
+        mapUrl: d.mapUrl?.trim() || "",
+        opensAt: d.opensAt || "",
+        closesAt: d.closesAt || "",
       };
       if (initial) await updateShop(initial.id, clean);
       else await createShop(clean);
@@ -560,6 +569,56 @@ function ShopForm({
               دووکانە.
             </span>
           </label>
+
+          <label className="block">
+            <span className="mb-1.5 block text-xs font-semibold">
+              بەستەری شوێن لە نەخشە
+            </span>
+            <input
+              dir="ltr"
+              inputMode="url"
+              placeholder="https://maps.app.goo.gl/…"
+              value={d.mapUrl ?? ""}
+              onChange={(e) => setD({ ...d, mapUrl: e.target.value })}
+              className={field}
+            />
+            <span className="mt-1.5 block text-[0.7rem] leading-relaxed text-muted-foreground">
+              لە گووگڵ مەپس شوێنەکە بدۆزەرەوە، Share لێبدە و بەستەرەکە لێرە
+              دابنێ. کڕیار کلیکی «ڕێگا» دەکات و مەپسەکەی بۆ دەکرێتەوە.
+            </span>
+          </label>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-semibold">کاتی کردنەوە</span>
+              <input
+                type="time"
+                dir="ltr"
+                value={d.opensAt ?? ""}
+                onChange={(e) => setD({ ...d, opensAt: e.target.value })}
+                className={field}
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-semibold">کاتی داخستن</span>
+              <input
+                type="time"
+                dir="ltr"
+                value={d.closesAt ?? ""}
+                onChange={(e) => setD({ ...d, closesAt: e.target.value })}
+                className={field}
+              />
+            </label>
+            <span className="text-[0.7rem] leading-relaxed text-muted-foreground sm:col-span-2">
+              ئەگەر بەتاڵیان بهێڵیتەوە، هیچ نیشانەیەکی «کراوەیە» پیشان نادرێت.
+              ئەوە باشترە لەوەی بە هەڵە بڵێین داخراوە.
+            </span>
+          </div>
+
+          <PhotoField
+            value={d.photo}
+            onChange={(photo) => setD({ ...d, photo })}
+          />
         </div>
 
         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
@@ -575,4 +634,139 @@ function ShopForm({
       </form>
     </div>
   );
+}
+
+/**
+ * The shop's photograph.
+ *
+ * Shrunk in the browser before it goes anywhere. A photo straight off a
+ * phone is four to eight megabytes and three thousand pixels wide; the card
+ * shows it about four hundred wide. Sending the original would cost the
+ * owner's data to upload and every visitor's data to download, for a picture
+ * nobody sees at that size.
+ *
+ * The upload goes straight to the bucket on a presigned URL, so the image
+ * never passes through a serverless function and cannot hit its body limit.
+ */
+function PhotoField({
+  value,
+  onChange,
+}: {
+  value?: string;
+  onChange: (key: string | undefined) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  async function pick(file: File) {
+    setBusy(true);
+    setError("");
+    try {
+      const blob = await downscale(file, 1200, 0.82);
+      const auth = getAuthOrNull();
+      const idToken = (await auth?.currentUser?.getIdToken()) ?? "";
+
+      const res = await fetch("/api/upload-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contentType: blob.type, idToken }),
+      });
+      if (!res.ok) {
+        const { error: e } = (await res.json().catch(() => ({}))) as {
+          error?: string;
+        };
+        throw new Error(
+          e === "storage-not-configured"
+            ? "خەزنکردنی وێنە هێشتا ڕێک نەخراوە."
+            : "بارکردن ڕەت کرایەوە.",
+        );
+      }
+      const { url, key } = (await res.json()) as { url: string; key: string };
+
+      const put = await fetch(url, {
+        method: "PUT",
+        headers: { "Content-Type": blob.type },
+        body: blob,
+      });
+      if (!put.ok) throw new Error("بارکردن سەرکەوتوو نەبوو.");
+
+      onChange(key);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "هەڵەیەک ڕوویدا");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="block">
+      <span className="mb-1.5 block text-xs font-semibold">وێنەی دووکان</span>
+
+      {value ? (
+        <div className="relative overflow-hidden rounded-xl border border-border">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={mediaSrc(value)} alt="" className="h-36 w-full object-cover" />
+          <button
+            type="button"
+            onClick={() => onChange(undefined)}
+            aria-label="لابردنی وێنە"
+            className="absolute end-2 top-2 grid size-8 place-items-center rounded-lg bg-black/60 text-white backdrop-blur"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+      ) : (
+        <label
+          className={`flex h-28 cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-border text-sm text-muted-foreground transition-colors hover:bg-muted ${
+            busy ? "pointer-events-none opacity-60" : ""
+          }`}
+        >
+          {busy ? (
+            <>
+              <Loader2 className="size-4 animate-spin" /> بارکردن…
+            </>
+          ) : (
+            <>
+              <Plus className="size-4" /> وێنەیەک هەڵبژێرە
+            </>
+          )}
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) void pick(f);
+              e.target.value = "";
+            }}
+          />
+        </label>
+      )}
+
+      {error && <p className="mt-1.5 text-xs text-red-600">{error}</p>}
+      <span className="mt-1.5 block text-[0.7rem] leading-relaxed text-muted-foreground">
+        وێنەکە پێش ناردن بچووک دەکرێتەوە، بۆیە گرنگ نییە چەند گەورە بێت.
+      </span>
+    </div>
+  );
+}
+
+/** Redraw at most `max` on the long edge, as WebP. */
+async function downscale(file: File, max: number, quality: number): Promise<Blob> {
+  const bitmap = await createImageBitmap(file);
+  const scale = Math.min(1, max / Math.max(bitmap.width, bitmap.height));
+  const w = Math.round(bitmap.width * scale);
+  const h = Math.round(bitmap.height * scale);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  canvas.getContext("2d")?.drawImage(bitmap, 0, 0, w, h);
+  bitmap.close();
+
+  const blob = await new Promise<Blob | null>((resolve) =>
+    canvas.toBlob(resolve, "image/webp", quality),
+  );
+  // A browser without WebP encoding hands back null; the original still works.
+  return blob ?? file;
 }

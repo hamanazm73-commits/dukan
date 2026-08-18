@@ -1,10 +1,12 @@
 "use client";
 
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
-import { MapPin, Phone, Search, X, type LucideIcon } from "lucide-react";
+import { Clock, Map, MapPin, Phone, Search, X, type LucideIcon } from "lucide-react";
 import * as Icons from "lucide-react";
 import { CATEGORIES, CITY_NAMES, SHOPS, type Shop } from "@/lib/data";
 import { createSearcher } from "@/lib/search";
+import { hoursLabel, isOpenNow } from "@/lib/hours";
+import { mediaSrc } from "@/lib/media";
 import { loadShops } from "@/lib/shops-repo";
 import { BrandMark } from "./brand-mark";
 
@@ -275,49 +277,116 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
   const cat = CATEGORIES.find((c) => c.key === shop.category);
   const Icon = iconFor(cat?.icon ?? "Store");
   const wa = shop.whatsapp ? `https://wa.me/${shop.whatsapp}` : undefined;
+  const open = isOpenNow(shop.opensAt, shop.closesAt);
+  const hours = hoursLabel(shop.opensAt, shop.closesAt);
+  const where = [CITY_NAMES[shop.city].ku, shop.district?.ku]
+    .filter(Boolean)
+    .join(" — ");
 
   return (
     <li
-      className="pop-in rounded-2xl border border-border bg-card p-4"
+      className="pop-in overflow-hidden rounded-2xl border border-border bg-card"
       style={{ animationDelay: `${Math.min(index, 8) * 28}ms` }}
     >
-      <div className="flex items-start gap-3">
-        <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-accent">
-          <Icon className="size-5 text-gold-foreground" aria-hidden />
-        </span>
-        <div className="min-w-0 flex-1">
-          <h2 className="truncate font-bold">{shop.name.ku}</h2>
-          <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-            <MapPin className="size-3 shrink-0" aria-hidden />
-            <span className="truncate">
-              {CITY_NAMES[shop.city].ku}
-              {shop.district ? ` — ${shop.district.ku}` : ""}
-            </span>
-          </p>
+      {/* The photograph, when there is one. Most shops will not have one for
+          a long time, so the card below has to stand on its own — this is an
+          addition to it rather than the thing it is built around. */}
+      {shop.photo && (
+        <div className="relative h-36 bg-muted sm:h-44">
+          <img
+            src={mediaSrc(shop.photo)}
+            alt=""
+            loading="lazy"
+            className="size-full object-cover"
+          />
+          <span className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-card to-transparent" />
         </div>
-      </div>
+      )}
 
-      <div className="mt-3 grid gap-2 sm:grid-cols-2">
-        <a
-          href={`tel:${shop.phone.replace(/\s/g, "")}`}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
-        >
-          <Phone className="size-4" aria-hidden />
-          پەیوەندی
-        </a>
-        {wa && (
-          <a
-            href={wa}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border px-4 text-sm font-bold transition-colors hover:bg-muted"
-          >
-            <svg viewBox="0 0 24 24" fill="currentColor" className="size-4" aria-hidden>
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347" />
-            </svg>
-            واتساپ
-          </a>
+      <div className={shop.photo ? "p-4 pt-2" : "p-4"}>
+        <div className="flex items-start gap-3">
+          {!shop.photo && (
+            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-accent">
+              <Icon className="size-5 text-gold-foreground" aria-hidden />
+            </span>
+          )}
+          <div className="min-w-0 flex-1">
+            <h2 className="truncate font-bold">{shop.name.ku}</h2>
+            <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+              <MapPin className="size-3 shrink-0" aria-hidden />
+              <span className="truncate">{where}</span>
+            </p>
+            {hours && (
+              <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+                <Clock className="size-3 shrink-0" aria-hidden />
+                <span dir="ltr">{hours}</span>
+              </p>
+            )}
+          </div>
+
+          {/* Only shown when the shop has actually given its hours. Silence
+              means we do not know, which must never be drawn as "closed". */}
+          {open !== null && (
+            <span
+              className={`shrink-0 rounded-full px-2.5 py-1 text-[0.7rem] font-bold ${
+                open
+                  ? "bg-green-600/15 text-green-500"
+                  : "bg-red-600/15 text-red-500"
+              }`}
+            >
+              {open ? "ئێستا کراوەیە" : "داخراوە"}
+            </span>
+          )}
+        </div>
+
+        {shop.tags && shop.tags.length > 0 && (
+          <ul className="mt-3 flex flex-wrap gap-1.5">
+            {shop.tags.slice(0, 5).map((t) => (
+              <li
+                key={t}
+                className="rounded-full bg-muted px-2.5 py-1 text-[0.7rem] text-muted-foreground"
+              >
+                {t}
+              </li>
+            ))}
+          </ul>
         )}
+
+        {/* Ringing is the one every shop can answer, so it keeps the filled
+            button; the other two appear only when the shop gave them. */}
+        <div className="mt-3 grid gap-2 sm:grid-cols-3">
+          <a
+            href={`tel:${shop.phone.replace(/s/g, "")}`}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
+          >
+            <Phone className="size-4" aria-hidden />
+            پەیوەندی
+          </a>
+          {wa && (
+            <a
+              href={wa}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border px-4 text-sm font-bold transition-colors hover:bg-muted"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="size-4" aria-hidden>
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347" />
+              </svg>
+              واتساپ
+            </a>
+          )}
+          {shop.mapUrl && (
+            <a
+              href={shop.mapUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border px-4 text-sm font-bold transition-colors hover:bg-muted"
+            >
+              <Map className="size-4" aria-hidden />
+              ڕێگا
+            </a>
+          )}
+        </div>
       </div>
     </li>
   );
