@@ -662,7 +662,15 @@ function PhotoField({
     setBusy(true);
     setError("");
     try {
-      const blob = await downscale(file, 1200, 0.82);
+      // Decoding is the one step that fails on the file rather than on the
+      // network — an iPhone .heic in a browser that cannot read one. Saying
+      // which it was beats an error the owner can do nothing with.
+      let blob: Blob;
+      try {
+        blob = await downscale(file, 1200, 0.82);
+      } catch {
+        throw new Error("ئەم جۆرە وێنەیە ناخوێنرێتەوە — JPG یان PNG تاقی بکەرەوە.");
+      }
       const auth = getAuthOrNull();
       const idToken = (await auth?.currentUser?.getIdToken()) ?? "";
 
@@ -732,7 +740,12 @@ function PhotoField({
           )}
           <input
             type="file"
-            accept="image/jpeg,image/png,image/webp"
+            /* Anything the machine calls a picture. Naming three types meant
+               Windows greyed out every other file in the dialog — a .jfif
+               saved out of a browser, a .heic off a phone, a plain .gif —
+               so the photo sat there visible and could not be clicked.
+               Whatever comes back is re-encoded below regardless. */
+            accept="image/*"
             className="hidden"
             onChange={(e) => {
               const f = e.target.files?.[0];
