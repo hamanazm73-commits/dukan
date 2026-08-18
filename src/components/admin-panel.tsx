@@ -241,10 +241,12 @@ function Dashboard({
         </button>
       </header>
 
-      {!live && !loading && (
+      {/* Not live means the read fell through to the seed list, and the seed
+          list is empty now — so this says the database is unreachable rather
+          than describing sample shops that no longer exist. */}
+      {!live && !loading && shops.length === 0 && (
         <p className="mb-4 rounded-xl border border-gold/40 bg-accent/50 px-3 py-2.5 text-xs leading-relaxed">
-          ئەمانەی خوارەوە دووکانی نموونەن، لە کۆدەکەوە دێن. یەکەم دووکانی
-          ڕاستەقینە کە زیاد بکەیت، شوێنیان دەگرێتەوە.
+          هێشتا هیچ دووکانێک نییە. یەکەمیان زیاد بکە.
         </p>
       )}
 
