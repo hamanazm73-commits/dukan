@@ -683,10 +683,18 @@ function PhotoField({
         const { error: e } = (await res.json().catch(() => ({}))) as {
           error?: string;
         };
+        // The reason is named rather than summarised. Every refusal used to
+        // read "rejected", which is true of all of them and useful for none:
+        // a signed-out session, a stranger, and an unconfigured bucket are
+        // three different problems with three different answers.
+        const why: Record<string, string> = {
+          "storage-not-configured": "خەزنکردنی وێنە هێشتا ڕێک نەخراوە.",
+          "not-owner": "ئەم هەژمارە ڕێگەی پێنەدراوە — بە ئیمەیڵی خاوەن بچۆ ژوورەوە.",
+          "unsupported-type": "ئەم جۆرە وێنەیە پەسەند ناکرێت.",
+          "invalid-json": "داواکارییەکە تێکچوو.",
+        };
         throw new Error(
-          e === "storage-not-configured"
-            ? "خەزنکردنی وێنە هێشتا ڕێک نەخراوە."
-            : "بارکردن ڕەت کرایەوە.",
+          why[e ?? ""] ?? `بارکردن ڕەت کرایەوە (${res.status} ${e ?? "?"}).`,
         );
       }
       const { url, key } = (await res.json()) as { url: string; key: string };
@@ -696,7 +704,11 @@ function PhotoField({
         headers: { "Content-Type": blob.type },
         body: blob,
       });
-      if (!put.ok) throw new Error("بارکردن سەرکەوتوو نەبوو.");
+      if (!put.ok) {
+        // The bucket is answering here, not this site, so its own status is
+        // the only thing that says why it turned the picture away.
+        throw new Error(`سەتڵەکە ڕەتیکردەوە (${put.status}).`);
+      }
 
       onChange(key);
     } catch (err) {
