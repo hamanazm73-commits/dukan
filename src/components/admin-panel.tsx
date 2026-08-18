@@ -674,14 +674,20 @@ function PhotoField({
       const auth = getAuthOrNull();
       const idToken = (await auth?.currentUser?.getIdToken()) ?? "";
 
-      const res = await fetch("/api/upload-url", {
+      // One request, to this site. The image used to go to the bucket
+      // directly on a presigned URL and the browser reported only "Failed to
+      // fetch" — a cross-origin refusal gives no more than that, and the
+      // bucket's CORS rules were provably fine. Same origin, no such class
+      // of failure.
+      const res = await fetch("/api/upload", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contentType: blob.type, idToken }),
+        headers: { "Content-Type": blob.type, "x-id-token": idToken },
+        body: blob,
       });
       if (!res.ok) {
-        const { error: e } = (await res.json().catch(() => ({}))) as {
+        const { error: e, message } = (await res.json().catch(() => ({}))) as {
           error?: string;
+          message?: string;
         };
         // The reason is named rather than summarised. Every refusal used to
         // read "rejected", which is true of all of them and useful for none:
@@ -691,25 +697,20 @@ function PhotoField({
           "storage-not-configured": "خەزنکردنی وێنە هێشتا ڕێک نەخراوە.",
           "not-owner": "ئەم هەژمارە ڕێگەی پێنەدراوە — بە ئیمەیڵی خاوەن بچۆ ژوورەوە.",
           "unsupported-type": "ئەم جۆرە وێنەیە پەسەند ناکرێت.",
-          "invalid-json": "داواکارییەکە تێکچوو.",
+          "too-large": "وێنەکە زۆر گەورەیە.",
+          empty: "فایلەکە بەتاڵە.",
         };
+        // The bucket's own words when it is the bucket refusing, since that
+        // names a wrong permission or a bad key outright.
+        if (e === "bucket-refused") {
+          throw new Error(`سەتڵەکە ڕەتیکردەوە: ${message ?? "?"}`);
+        }
         throw new Error(
           why[e ?? ""] ?? `بارکردن ڕەت کرایەوە (${res.status} ${e ?? "?"}).`,
         );
       }
-      const { url, key } = (await res.json()) as { url: string; key: string };
 
-      const put = await fetch(url, {
-        method: "PUT",
-        headers: { "Content-Type": blob.type },
-        body: blob,
-      });
-      if (!put.ok) {
-        // The bucket is answering here, not this site, so its own status is
-        // the only thing that says why it turned the picture away.
-        throw new Error(`سەتڵەکە ڕەتیکردەوە (${put.status}).`);
-      }
-
+      const { key } = (await res.json()) as { key: string };
       onChange(key);
     } catch (err) {
       setError(err instanceof Error ? err.message : "هەڵەیەک ڕوویدا");
