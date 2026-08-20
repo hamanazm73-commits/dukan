@@ -9,3 +9,6 @@ next-env.d.ts
 .vercel
 .env*
 .deploy*.log
+
+# Personal to one machine — not shared between developers.
+.claude/settings.local.json
