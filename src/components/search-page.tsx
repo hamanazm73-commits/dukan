@@ -4,6 +4,7 @@ import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { Clock, Map, MapPin, Phone, Search, X, type LucideIcon } from "lucide-react";
 import * as Icons from "lucide-react";
 import { CATEGORIES, CITY_NAMES, SHOPS, type Shop } from "@/lib/data";
+import { CITY_KEYS, useHomeCity } from "@/lib/city";
 import { createSearcher } from "@/lib/search";
 import { hoursLabel, isOpenNow } from "@/lib/hours";
 import { mediaSrc } from "@/lib/media";
@@ -114,10 +115,19 @@ export function SearchPage() {
   const deferred = useDeferredValue(query);
   const typed = query.trim().length > 0;
 
+  // Where they are. Asked for on the first search, never on arrival.
+  const home = useHomeCity(typed);
+  const [pickerOpen, setPickerOpen] = useState(false);
+
   const result = useMemo(
-    () => (deferred.trim() ? searcher(deferred) : null),
-    [deferred, searcher],
+    () => (deferred.trim() ? searcher(deferred, home.city ?? undefined) : null),
+    [deferred, searcher, home.city],
   );
+
+  /* Near shops are the answer; far ones stand in only when there are none.
+     One list is rendered either way — what changes is the sentence above it. */
+  const fallback = !!result && result.shops.length === 0 && result.elsewhere.length > 0;
+  const list = result ? (fallback ? result.elsewhere : result.shops) : [];
 
   return (
     /*
@@ -232,12 +242,73 @@ export function SearchPage() {
 
       {result && (
         <div className="mt-5">
+          {/* Which city these answers came from, and the way to change it.
+              Only ever after a search: on the empty page it would be one more
+              thing to choose from before saying what you want. */}
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setPickerOpen((v) => !v)}
+              aria-expanded={pickerOpen}
+              className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs text-foreground transition-colors hover:bg-muted"
+            >
+              <MapPin className="size-3.5 shrink-0 text-gold" aria-hidden />
+              {home.city ? CITY_NAMES[home.city].ku : "شارەکەت دیاری بکە"}
+            </button>
+            {home.status === "locating" && (
+              <span className="text-xs text-muted-foreground">
+                شوێنەکەت دەدۆزرێتەوە…
+              </span>
+            )}
+          </div>
+
+          {pickerOpen && (
+            <div className="mb-3 rounded-2xl border border-border bg-card p-3">
+              <p className="mb-2 text-xs text-muted-foreground">
+                لە کام شاردایت؟
+              </p>
+              {/* Wraps rather than scrolls: twelve names must all be reachable
+                  on a 375px screen without a hidden row. */}
+              <div className="flex flex-wrap gap-1.5">
+                {CITY_KEYS.map((key) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => {
+                      home.choose(key);
+                      setPickerOpen(false);
+                    }}
+                    className={`h-8 rounded-full border px-3 text-xs transition-colors ${
+                      home.city === key
+                        ? "border-transparent bg-primary font-bold text-primary-foreground"
+                        : "border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+                    }`}
+                  >
+                    {CITY_NAMES[key].ku}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    home.choose(null);
+                    setPickerOpen(false);
+                  }}
+                  className={`h-8 rounded-full border px-3 text-xs transition-colors ${
+                    home.city === null
+                      ? "border-transparent bg-primary font-bold text-primary-foreground"
+                      : "border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+                  }`}
+                >
+                  هەموو شارەکان
+                </button>
+              </div>
+            </div>
+          )}
+
           <p className="mb-3 text-xs text-muted-foreground">
-            {result.shops.length > 0 ? (
+            {list.length > 0 ? (
               <>
-                <span className="font-bold text-foreground">
-                  {result.shops.length}
-                </span>{" "}
+                <span className="font-bold text-foreground">{list.length}</span>{" "}
                 دووکان
                 {result.category && (
                   <>
@@ -245,6 +316,8 @@ export function SearchPage() {
                     لە <span className="text-gold">{result.category.label.ku}</span>
                   </>
                 )}
+                {/* A city named in the query is worth repeating back. The one
+                    we chose for them is already on the button above. */}
                 {result.city && <> لە {CITY_NAMES[result.city].ku}</>}
               </>
             ) : (
@@ -252,7 +325,20 @@ export function SearchPage() {
             )}
           </p>
 
-          {result.shops.length === 0 ? (
+          {/* Said before the far-away list, not inside it: the point is that
+              these are not near, and a card cannot carry that. */}
+          {fallback && result.homeCity && (
+            <div className="mb-3 rounded-2xl border border-dashed border-border p-4 text-center">
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                لە <span className="text-foreground">{CITY_NAMES[result.homeCity].ku}</span>{" "}
+                نەدۆزرایەوە.
+                <br />
+                بەڵام لە شارەکانی تر هەیە:
+              </p>
+            </div>
+          )}
+
+          {list.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border p-8 text-center">
               <p className="text-sm leading-relaxed text-muted-foreground">
                 هیچ دووکانێک بەم ناوە نەدۆزرایەوە.
@@ -262,7 +348,7 @@ export function SearchPage() {
             </div>
           ) : (
             <ul className="grid gap-2.5">
-              {result.shops.map((shop, i) => (
+              {list.map((shop, i) => (
                 <ShopCard key={shop.id} shop={shop} index={i} />
               ))}
             </ul>

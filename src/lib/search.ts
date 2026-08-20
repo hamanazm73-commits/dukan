@@ -102,11 +102,21 @@ function hits(token: string, terms: string[]): number {
 }
 
 export interface SearchResult {
+  /** the answer: what is within reach, or everything when there is no city */
   shops: Shop[];
+  /**
+   * The same query answered from other cities, and only ever populated when
+   * the home city answered it with nothing. Somewhere else is not a result
+   * alongside somewhere near — it is what you are told when there is no
+   * somewhere near, and the two must never be mixed into one list.
+   */
+  elsewhere: Shop[];
   /** the category the query was understood as, when it was understood as one */
   category?: Category;
-  /** the city the query narrowed to */
+  /** the city named in the query itself */
   city?: CityKey;
+  /** the city the results were narrowed to on the searcher's behalf */
+  homeCity?: CityKey;
   /** the words that meant nothing — shown so a dead end can be explained */
   unmatched: string[];
 }
@@ -120,15 +130,20 @@ export interface SearchResult {
  */
 export function createSearcher(shops: Shop[]) {
   const index = buildIndex(shops);
-  return (query: string): SearchResult => runSearch(query, index);
+  return (query: string, homeCity?: CityKey): SearchResult =>
+    runSearch(query, index, homeCity);
 }
 
 /** The seed searcher, for anything rendered before live shops arrive. */
 export const search = createSearcher(SHOPS);
 
-function runSearch(query: string, INDEX: Indexed[]): SearchResult {
+function runSearch(
+  query: string,
+  INDEX: Indexed[],
+  homeCity?: CityKey,
+): SearchResult {
   const qs = tokens(query);
-  if (!qs.length) return { shops: [], unmatched: [] };
+  if (!qs.length) return { shops: [], elsewhere: [], unmatched: [] };
 
   // 1 — read the query: which words name a category, which name a city
   let category: Category | undefined;
@@ -218,10 +233,23 @@ function runSearch(query: string, INDEX: Indexed[]): SearchResult {
   }
 
   scored.sort((a, b) => b.score - a.score);
-  return {
-    shops: scored.map((s) => s.shop),
+  const all = scored.map((s) => s.shop);
+  const common = {
     category: categoryScore > 0 ? category : undefined,
     city,
     unmatched,
   };
+
+  // 3 — put the city first
+  //
+  // A city typed into the query outranks the one we worked out on their
+  // behalf: naming Erbil is asking about Erbil, and answering with Kirkuk
+  // because that is where the phone is would be ignoring what was asked.
+  if (city || !homeCity) return { shops: all, elsewhere: [], ...common };
+
+  const near = all.filter((s) => s.city === homeCity);
+  if (near.length > 0) return { shops: near, elsewhere: [], homeCity, ...common };
+
+  // Nothing here. Only now does anywhere else become worth saying.
+  return { shops: [], elsewhere: all, homeCity, ...common };
 }
