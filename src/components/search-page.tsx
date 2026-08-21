@@ -378,26 +378,16 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
           a long time, so the card below has to stand on its own — this is an
           addition to it rather than the thing it is built around.
 
-          The card takes the shape of the photograph rather than the other way
-          round. A fixed strip and object-cover cropped every picture to one
-          ratio, and what a shop chooses to photograph — a sign, a frontage, a
-          room — is rarely the shape of a strip; the sign that names the place
-          was the first thing cut off.
-
-          Width first, and no height limit. A capped height was tried and it
-          fails on a wide screen for exactly the reason a crop fails on a
-          narrow one: at 640px across, a near-square photo hit the cap and sat
-          in the middle of the card with a bar of empty panel down each side.
-          Full width, height following the picture's own proportions, and the
-          card grows to hold it. Cards no longer match each other in height —
-          that is the price of never cutting one. */}
+          One ratio for every card, the same 3:2 the hotels site uses, so the
+          picture stays in proportion to the lines underneath it and no card
+          towers over its neighbours. */}
       {shop.photo && (
-        <div className="relative bg-muted">
+        <div className="relative aspect-[3/2] overflow-hidden bg-muted">
           <img
             src={mediaSrc(shop.photo)}
             alt=""
             loading="lazy"
-            className="block h-auto w-full"
+            className="size-full object-cover"
           />
         </div>
       )}

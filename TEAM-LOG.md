@@ -10,6 +10,13 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 03:31 — hamakali2005 · done
+
+Shop photographs are 3:2 now, the same ratio the hotels site uses. The
+full-height version dwarfed the name and phone number under it and left every
+card a different height. 341x227 in a 343px card — 56% of it, against most of
+it before.
+
 ## 2026-08-21 03:28 — hamakali2005 · done
 
 **Photographs fill the card's width now.** The height cap added earlier failed
