@@ -127,7 +127,17 @@ export async function POST(req: Request) {
 
     const parsed = response.parsed_output;
     if (!parsed) {
-      return NextResponse.json({ category: null, terms: [] });
+      // "No structured answer came back" and "the model looked and found no
+      // trade that sells this" are the same empty result to whoever is
+      // searching, and they were the same silence here too — which made the
+      // first impossible to tell from the second while it was happening.
+      // Only the reason is added; the answer itself is unchanged.
+      console.error("[interpret] no parsed output, stop:", response.stop_reason);
+      return NextResponse.json({
+        category: null,
+        terms: [],
+        reason: "unparsed",
+      });
     }
     return NextResponse.json({
       category: parsed.category,
