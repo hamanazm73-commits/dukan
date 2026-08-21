@@ -280,6 +280,34 @@ export default async function ShopPage({
           </ul>
         </section>
       )}
+
+      {/*
+        The rest of the family.
+
+        These links were on the search page and did not belong there: that
+        page is one question, and a row of other places to go beside it is an
+        answer to a question nobody asked. Here they are unobjectionable —
+        somebody reading a shop has finished reading, and a search engine
+        still gets what it needs, which is a link from a child back to its
+        parent.
+      */}
+      <nav className="mt-10 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-white/30">
+        <a href="https://layhama.com" className="transition-colors hover:text-gold">
+          لای حەمە
+        </a>
+        <a
+          href="https://hotels.layhama.com"
+          className="transition-colors hover:text-gold"
+        >
+          هۆتێلەکانی لای حەمە
+        </a>
+        <a
+          href="https://homes.layhama.com"
+          className="transition-colors hover:text-gold"
+        >
+          نووسینگەی لای حەمە
+        </a>
+      </nav>
     </main>
   );
 }

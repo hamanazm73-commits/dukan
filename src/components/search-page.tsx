@@ -499,33 +499,6 @@ export function SearchPage() {
         </div>
       )}
 
-      {/*
-        The rest of the family, at the very bottom.
-
-        The hub links down to this site and nothing here linked back, and a
-        page with no outward link to its own parent reads to a search engine
-        as unrelated to it. Three quiet links say otherwise.
-
-        Below everything, in the muted colour, on purpose: this page is one
-        question, and a row of other places to go does not belong beside it.
-      */}
-      <footer className="mt-auto flex flex-wrap items-center justify-center gap-x-5 gap-y-2 pt-14 text-xs text-white/35">
-        <a href="https://layhama.com" className="transition-colors hover:text-gold">
-          لای حەمە
-        </a>
-        <a
-          href="https://hotels.layhama.com"
-          className="transition-colors hover:text-gold"
-        >
-          هۆتێلەکانی لای حەمە
-        </a>
-        <a
-          href="https://homes.layhama.com"
-          className="transition-colors hover:text-gold"
-        >
-          نووسینگەی لای حەمە
-        </a>
-      </footer>
     </main>
   );
 }
