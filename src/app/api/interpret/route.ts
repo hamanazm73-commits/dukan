@@ -114,7 +114,20 @@ export async function POST(req: Request) {
   try {
     const response = await anthropic.messages.parse({
       model: "claude-opus-5",
-      max_tokens: 1024,
+      /*
+       * Not 1024.
+       *
+       * Thinking is on by default on this model and is spent out of the same
+       * allowance as the answer. At 1024 the whole budget went on thinking and
+       * the turn ended before the classification was written — every query came
+       * back `category: null`, including ones the prompt gives as worked
+       * examples. Nothing errored: an empty answer and a truncated one are the
+       * same shape.
+       *
+       * The answer itself is a key and a handful of words. This is headroom for
+       * the reasoning in front of it, not for the output.
+       */
+      max_tokens: 4096,
       // Low effort on purpose: this is a one-word classification against a
       // list of sixteen, and the shopper is waiting with the keyboard open.
       output_config: {
@@ -138,6 +151,13 @@ export async function POST(req: Request) {
         terms: [],
         reason: "unparsed",
       });
+    }
+    // A null answer is a real answer — "no trade here sells that" — but it is
+    // also what a truncated turn looks like. Recording why the turn ended is
+    // what separates them; `max_tokens` here means the allowance ran out
+    // rather than the model having decided anything.
+    if (!parsed.category) {
+      console.error("[interpret] null category, stop:", response.stop_reason);
     }
     return NextResponse.json({
       category: parsed.category,
