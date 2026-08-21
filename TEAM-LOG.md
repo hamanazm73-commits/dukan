@@ -10,6 +10,19 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 15:33 — hamakali2005 · done
+
+**The tab has the shop mark now.** This site had no icon at all, so browsers
+drew the grey globe while the three sister sites each showed their emblem.
+`src/app/icon.svg` — same navy tile, gold double ring and three stars, with the
+shopfront in the middle.
+
+The doorway is cut with `fill-rule` instead of a mask, and `brand-mark.tsx` was
+changed the same way. It had inherited the `mask="url(#door)"` the sister sites
+were explicitly warned off: a phone that declines to resolve the reference
+drops the whole group and the mark disappears. Worse here than there — every
+result card draws it, so one id repeated dozens of times per page.
+
 ## 2026-08-21 15:27 — hamakali2005 · done
 
 **English is laid out right-to-left now, like the other two.** Hama asked for

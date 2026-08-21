@@ -28,12 +28,20 @@ export function BrandMark({ className }: { className?: string }) {
           d="M28 44 L72 44 L72 52 q-5.5 5 -11 0 q-5.5 5 -11 0 q-5.5 5 -11 0 q-5.5 5 -11 0 Z"
           fill={GOLD}
         />
-        {/* the shop below it, with the doorway cut out */}
-        <mask id="door">
-          <rect width="100" height="100" fill="white" />
-          <rect x="44" y="60" width="12" height="14" rx="1.4" fill="black" />
-        </mask>
-        <path d="M32 56 H68 V74 H32 Z" fill={GOLD} mask="url(#door)" />
+        {/* The shop below it, doorway cut with fill-rule rather than a mask.
+            A mask is a `url(#id)` reference, and the sister sites lost whole
+            emblems to phones that declined to resolve one — the masked group
+            vanishes and the mark is simply gone. evenodd is resolved by the
+            renderer with nothing to look up.
+
+            The id mattered here more than most: every card on the page draws
+            this mark, so `id="door"` appeared dozens of times in one document. */}
+        <path
+          d="M32 56 H68 V74 H32 Z
+             M45.4 60 H54.6 A1.4 1.4 0 0 1 56 61.4 V74 H44 V61.4 A1.4 1.4 0 0 1 45.4 60 Z"
+          fill={GOLD}
+          fillRule="evenodd"
+        />
       </svg>
     </span>
   );
