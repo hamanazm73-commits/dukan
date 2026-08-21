@@ -265,6 +265,54 @@ export function SearchPage() {
             )}
           </div>
 
+          {/*
+            Asked here, before the browser is.
+
+            The browser's own bar says a site "wants to know your location"
+            and nothing else — no reason, from a page opened seconds ago —
+            and a refusal to it is permanent. So the reason comes first, in
+            words, with a way out that costs nothing: the browser is only
+            ever reached through the button on the right, and "not now"
+            never touches it at all.
+          */}
+          {home.status === "asking" && (
+            <div className="pop-in mb-3 overflow-hidden rounded-2xl border border-gold/30 bg-card">
+              <div className="flex gap-3 p-4">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-gold/15">
+                  <MapPin className="size-5 text-gold" aria-hidden />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-bold">
+                    نزیکترین دووکانت پیشان بدەین؟
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                    ئەگەر شارەکەت بزانین، ئەو دووکانانەت پیشان دەدەین کە لە
+                    شارەکەی خۆتدان — نەک شارێکی دوور. تەنها ناوی شارەکە
+                    بەکاردێت، و لە وێبگەڕەکەی خۆتدا دەمێنێتەوە.
+                  </p>
+                </div>
+              </div>
+              {/* Stacked under 380px: two labelled buttons side by side leave
+                  about 150px each on a phone, and the words wrap mid-word. */}
+              <div className="grid gap-2 border-t border-border p-3 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={home.decline}
+                  className="h-10 rounded-xl border border-border text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted"
+                >
+                  ئێستا نا
+                </button>
+                <button
+                  type="button"
+                  onClick={home.locate}
+                  className="h-10 rounded-xl bg-gold text-sm font-bold text-gold-foreground transition-opacity hover:opacity-90"
+                >
+                  بەڵێ، شارەکەم بدۆزەوە
+                </button>
+              </div>
+            </div>
+          )}
+
           {pickerOpen && (
             <div className="mb-3 rounded-2xl border border-border bg-card p-3">
               <p className="mb-2 text-xs text-muted-foreground">

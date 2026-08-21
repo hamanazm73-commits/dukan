@@ -73,6 +73,25 @@ export function nearestCity(lat: number, lng: number): CityKey {
   return best;
 }
 
+const DISMISS_KEY = "dukan.city.dismissed";
+
+function dismissedThisVisit(): boolean {
+  if (typeof sessionStorage === "undefined") return false;
+  try {
+    return sessionStorage.getItem(DISMISS_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+function rememberDismissed() {
+  if (typeof sessionStorage === "undefined") return;
+  try {
+    sessionStorage.setItem(DISMISS_KEY, "1");
+  } catch {
+    /* private mode — asking again next visit is survivable */
+  }
+}
+
 function readStored(): CityKey | null {
   if (typeof localStorage === "undefined") return null;
   try {
@@ -97,6 +116,17 @@ function writeStored(city: CityKey | null) {
 export type CityStatus =
   /** nothing stored and nothing asked for yet */
   | "idle"
+  /**
+   * Our own card is up, explaining what is about to be asked for and why.
+   * The browser has not been touched yet.
+   *
+   * This state exists because the browser's own bar arrives with no reason
+   * attached: a strip at the top of the screen demanding a location, from a
+   * shop directory a person opened three seconds ago. Most people refuse it,
+   * and a refusal is permanent — the browser will not ask that site again.
+   * So the explanation has to come first, from us, where it can be read.
+   */
+  | "asking"
   /** the browser is being asked where it is */
   | "locating"
   /** we have a city */
@@ -109,8 +139,10 @@ export interface HomeCity {
   status: CityStatus;
   /** chosen by hand; overrides anything measured, and is remembered */
   choose: (city: CityKey | null) => void;
-  /** ask the browser again after a refusal */
+  /** ask the browser — only ever from something the person just tapped */
   locate: () => void;
+  /** close the explanation without the browser being asked at all */
+  decline: () => void;
 }
 
 /**
@@ -153,11 +185,46 @@ export function useHomeCity(active: boolean): HomeCity {
     );
   }, []);
 
-  // The first search is what triggers the ask.
+  /**
+   * The first search raises our card — not the browser's.
+   *
+   * Unless the permission was already given, in which case there is nothing
+   * to explain and the card would only be in the way: ask the browser
+   * straight away and let the city appear. `permissions` is missing on some
+   * browsers, so its absence is treated as "not yet granted" and the card
+   * shows, which is the safe way round.
+   */
   useEffect(() => {
     if (!active || city || status !== "idle") return;
-    locate();
+    if (dismissedThisVisit()) {
+      setStatus("unknown");
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const p = await navigator.permissions?.query({ name: "geolocation" });
+        if (cancelled) return;
+        if (p?.state === "granted") {
+          locate();
+          return;
+        }
+      } catch {
+        /* fall through to the card */
+      }
+      if (!cancelled) setStatus("asking");
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [active, city, status, locate]);
+
+  /** They said not now. Drop it for this visit rather than asking again on
+      the next keystroke. */
+  const decline = useCallback(() => {
+    rememberDismissed();
+    setStatus("unknown");
+  }, []);
 
   const choose = useCallback((next: CityKey | null) => {
     setCity(next);
@@ -165,5 +232,5 @@ export function useHomeCity(active: boolean): HomeCity {
     setStatus(next ? "ready" : "unknown");
   }, []);
 
-  return { city, status, choose, locate };
+  return { city, status, choose, locate, decline };
 }
