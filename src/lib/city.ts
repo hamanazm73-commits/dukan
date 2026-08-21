@@ -205,12 +205,22 @@ export function useHomeCity(active: boolean): HomeCity {
       try {
         const p = await navigator.permissions?.query({ name: "geolocation" });
         if (cancelled) return;
+        // Already given: nothing to explain, and the card would only be in
+        // the way of a city that is about to appear on its own.
         if (p?.state === "granted") {
           locate();
           return;
         }
+        // Already refused: the browser will not ask this site again, so the
+        // card would be a door that opens onto a wall — tapping yes would do
+        // nothing at all and there would be no way to tell why. Say nothing
+        // and leave them the city picker, which always works.
+        if (p?.state === "denied") {
+          setStatus("unknown");
+          return;
+        }
       } catch {
-        /* fall through to the card */
+        /* no permissions API — show the card, which is the safe way round */
       }
       if (!cancelled) setStatus("asking");
     })();
