@@ -403,6 +403,15 @@ function ShopForm({
           ar: d.name.ar.trim() || d.name.ku.trim(),
           en: d.name.en.trim() || d.name.ku.trim(),
         },
+        // Written as an empty map rather than left out. Opening a shop that
+        // has no district seeds this field with undefined, and an absent key
+        // in an update means "leave it alone" — so omitting it would also
+        // make clearing a district impossible.
+        district: {
+          ku: d.district?.ku?.trim() ?? "",
+          ar: d.district?.ar?.trim() ?? "",
+          en: d.district?.en?.trim() ?? "",
+        },
         phone: d.phone.trim(),
         whatsapp: d.whatsapp?.trim() || "",
         tags: (d.tags ?? []).map((t) => t.trim()).filter(Boolean),

@@ -10,6 +10,25 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 03:16 — hamakali2005 · done
+
+**Saving an edited shop failed on `district`.** Opening a shop that has no
+district seeded the form with `district: undefined`, the key travelled into the
+write, and Firestore refuses undefined outright — "Unsupported field value:
+undefined (found in field district)". Every other optional field was already
+normalised in `save()`; this one had been missed.
+
+It now writes an empty map instead of being left out, because an absent key in
+an update means "leave it alone", so omitting it would have made clearing a
+district impossible. `shops-repo.ts` also drops undefined keys before writing
+now, so the next optional field added upstream cannot fail a save the same way.
+
+Also: image upload was dead here because `S3_ACCESS_KEY_ID` and
+`S3_SECRET_ACCESS_KEY` were blank in this machine's `.env.local` — deliberately,
+they were stripped before being sent. Filled from the hotels site, which shares
+the same bucket. **Nothing in git changed for that; it is env only, and Vercel
+needs the same two values if uploads are to work on the live site.**
+
 ## 2026-08-21 03:05 — hamakali2005 · done
 
 **Saving a shop failed with "Missing or insufficient permissions".** Not the
