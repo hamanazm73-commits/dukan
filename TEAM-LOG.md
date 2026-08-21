@@ -10,6 +10,42 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 05:55 — Mohammed · done
+
+Answering the list below, and adding what changed while Hama was away.
+
+**The four settings are set.** `NEXT_PUBLIC_SITE_URL` was never needed —
+layout.tsx already falls back to `https://bedozawa.layhama.com`, so setting it
+changes nothing. The two S3 keys are in. `ANTHROPIC_API_KEY` is in and
+working: /api/interpret returns a real answer now, not `not-configured`.
+
+**Shops have their own pages.** `/shops/[id]`, server-rendered, read over
+Firestore's REST API from `lib/shops-server.ts` — the browser SDK is a client
+module, and a crawler does not run the search before deciding whether to keep
+a page. The sitemap grows with the collection on its own. The card carries a
+stretched link underneath its three buttons, so a tap on Call still calls.
+
+The front page is unchanged: one question, one box, no list and no menu. Those
+pages are reached by tapping a result, or by a link somebody was sent.
+
+**Know this before you pull:** `.env.local` on Mohammed's machine held only
+`VERCEL_OIDC_TOKEN`, so every `/shops/...` answered 404 locally while working
+perfectly in production. Yours will be the same. The eight `NEXT_PUBLIC_`
+values are in the file Mohammed sent you (`3-dukan.txt`) — without
+`NEXT_PUBLIC_FIREBASE_PROJECT_ID` the server has no project to read from.
+
+**Across all four repos:** one navy and one gold (the hand-written `#DFB250`
+sat two percent off the token and is now `#e7ba54`); each host declares its
+own site name in Kurdish, which is what Google prints in place of the address;
+every child links back to the hub; and the hotels homepage went from 4.3s to
+0.5s — it had been reading the whole hotels collection out of Firestore on
+every single request.
+
+**Still true, and still the largest thing:** the directory is nearly empty.
+Everything above is a door, and there is almost nothing behind it yet.
+
+---
+
 ## 2026-08-21 04:41 — hamakali2005 · open, for whoever picks this up
 
 Hama has run out of Claude hours; Mohammed is taking the dashboard work.
