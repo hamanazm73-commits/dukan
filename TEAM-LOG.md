@@ -10,6 +10,14 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 13:57 — hamakali2005 · done
+
+**Removed the family links from the shop page**, the same row Hama asked to
+have taken off the other two sites. They were already off the search page.
+Nothing on this site links out to the siblings now.
+
+If a link home is wanted again for crawling, ask him first.
+
 ## 2026-08-21 06:05 — hamakali2005 · done
 
 **Vocabulary 433 → 759 terms.** Things, in the words people reach for: شاحن,
