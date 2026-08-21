@@ -138,12 +138,15 @@ export function SearchPage() {
      * list of answers and the field is a tool above it, not the subject.
      */
     <main
-      className={`relative mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-4 pb-16 transition-all duration-500 ${
+      className={`relative mx-auto flex min-h-dvh w-full max-w-7xl flex-col px-4 pb-16 transition-all duration-500 sm:px-6 ${
         typed ? "justify-start" : "justify-center pb-[26vh]"
       }`}
     >
+      {/* The page is as wide as the hotels site so the results can sit three
+          abreast, but the mark and the field stay in a 2xl column down the
+          middle. A search box stretched across a desktop is a worse box. */}
       <div
-        className={`flex flex-col items-center text-center transition-all duration-500 ${
+        className={`mx-auto flex w-full max-w-2xl flex-col items-center text-center transition-all duration-500 ${
           typed ? "pt-8 pb-5" : "pt-0 pb-12"
         }`}
       >
@@ -190,7 +193,7 @@ export function SearchPage() {
       </div>
 
       <div
-        className={`field sticky top-3 z-20 rounded-2xl ${typed ? "" : "arrive"}`}
+        className={`field sticky top-3 z-20 mx-auto w-full max-w-2xl rounded-2xl ${typed ? "" : "arrive"}`}
         style={typed ? undefined : { animationDelay: "440ms" }}
       >
         <div className="field-inner flex items-center gap-2 px-3.5">
@@ -347,7 +350,7 @@ export function SearchPage() {
               </p>
             </div>
           ) : (
-            <ul className="grid gap-2.5">
+            <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {list.map((shop, i) => (
                 <ShopCard key={shop.id} shop={shop} index={i} />
               ))}

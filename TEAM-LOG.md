@@ -10,6 +10,15 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 03:40 — hamakali2005 · done
+
+Results are laid out like the hotels site: max-w-7xl page, `grid gap-6
+sm:grid-cols-2 lg:grid-cols-3`. Three cards abreast at 1265px, one at 375px,
+nothing off-screen either way. The mark and the search field keep their own
+2xl column down the middle — a search box stretched across a desktop is a
+worse box. Palette, radius and fonts already matched; the width and the grid
+were the whole difference.
+
 ## 2026-08-21 03:36 — hamakali2005 · done
 
 Shop cards rebuilt to the hotels site's card: rounded-2xl on a ring that turns
