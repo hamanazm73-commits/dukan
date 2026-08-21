@@ -134,13 +134,6 @@ export async function POST(req: Request) {
   }
 
   try {
-    // One line, until this is understood: if the trades never reached the
-    // model, a null answer is the only correct one it could give.
-    console.error(
-      "[interpret] prompt chars:", SYSTEM.length,
-      "keys:", KEYS.length,
-      "first:", KEYS[0],
-    );
     const response = await anthropic.messages.parse({
       model: "claude-opus-5",
       /*
@@ -188,24 +181,20 @@ export async function POST(req: Request) {
      * every keyword except type, anyOf, items, properties, required and
      * additionalProperties on its way to the API, and `enum` is not on that
      * list. It survives only as a note inside `description`. So the model is
-     * handed a free-form string and asked nicely — which is exactly what it
-     * behaved like, answering null to every query for a day.
+     * handed a free-form string and asked nicely.
      *
-     * The keys are named in the system prompt, so a good answer arrives
-     * anyway. This is what makes a bad one safe: anything that is not one of
-     * the sixteen becomes null rather than a category key the rest of the
-     * site would search for and never find.
+     * It answers well — the keys are named in the system prompt. This is what
+     * makes a bad answer safe: anything that is not one of the sixteen becomes
+     * null rather than a key the rest of the site would search for and never
+     * find.
      */
     const raw = parsed.category?.trim().toLowerCase() ?? "";
     const category = KEYS.includes(raw) ? raw : null;
 
-    if (!category) {
-      console.error(
-        "[interpret] no category, stop:",
-        response.stop_reason,
-        "raw:",
-        parsed.category,
-      );
+    // "none" is an answer, not a fault — no trade here sells a plane ticket.
+    // A word that is neither a key nor "none" is the thing worth recording.
+    if (!category && raw !== NONE) {
+      console.error("[interpret] unknown category:", raw);
     }
     return NextResponse.json({ category, terms: parsed.terms ?? [] });
   } catch (err) {
