@@ -22,7 +22,20 @@ export const LOCALES: {
 }[] = [
   { code: "ku", label: "کوردی", dir: "rtl", html: "ckb" },
   { code: "ar", label: "العربية", dir: "rtl", html: "ar" },
-  { code: "en", label: "English", dir: "ltr", html: "en" },
+  /*
+   * English is laid out right-to-left as well, on purpose.
+   *
+   * The obvious thing is dir="ltr", and it was that first: the whole page
+   * mirrored, the mark and the field swapped sides, every card reversed. The
+   * site stopped looking like itself for one of its three languages.
+   *
+   * This audience reads Kurdish and Arabic. English here is the third choice
+   * for the same people and the same shops, not a different site for a
+   * different market — so it keeps the shape they already know and only the
+   * words change. English words still run left to right inside their own
+   * lines; the browser handles that on its own.
+   */
+  { code: "en", label: "English", dir: "rtl", html: "en" },
 ];
 
 export const DEFAULT_LOCALE: Locale = "ku";

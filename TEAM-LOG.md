@@ -10,6 +10,17 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 15:27 — hamakali2005 · done
+
+**English is laid out right-to-left now, like the other two.** Hama asked for
+it: switching to English mirrored the whole page, and he wants the words to
+change without the site rearranging itself.
+
+Measured across all three languages — the mark, the field, the switcher, the
+card, the title and the call button all land on the same pixels, nothing off
+screen at 375px. English text still reads left to right within its own lines;
+that is the browser, not us.
+
 ## OPEN — Mohammed: Vercel is blocking everything Hama pushes
 
 Vercel's own words, on the dukan deployment of `0b92381`:
