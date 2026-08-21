@@ -178,7 +178,7 @@ export function SearchPage() {
               typed ? "text-3xl" : "text-[2.9rem] sm:text-[4.2rem]"
             }`}
           >
-            بازاڕی لای حەمە
+            لای حەمە بیدۆزەوە
           </h1>
         </div>
 

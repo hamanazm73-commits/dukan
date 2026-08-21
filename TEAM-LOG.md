@@ -10,6 +10,14 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 03:49 — hamakali2005 · done
+
+Site renamed to **لای حەمە بیدۆزەوە** — heading, document title and
+applicationName. Also killed the second cross in the search field: type="search"
+earns the input Chrome's own clear button, which sat beside ours. Ours is the
+one kept, since it is styled with the field, labelled سڕینەوە, and puts the
+cursor back in the box.
+
 ## 2026-08-21 03:46 — hamakali2005 · done
 
 Typography brought onto the hotels site's base layer: Naskh leads for Kurdish

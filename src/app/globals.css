@@ -113,6 +113,18 @@
   }
 }
 
+/* type="search" earns the field Chrome's own clear button, so there were two
+   crosses side by side. Ours is the one that stays: it is styled with the
+   field, it is labelled, and it puts the cursor back in the box afterwards. */
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
 /* Photographs arrive rather than appear — the hotels site's fade, so a picture
    landing after its card does not snap into place. */
 .img-fade {
