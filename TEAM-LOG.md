@@ -10,6 +10,14 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 03:36 — hamakali2005 · done
+
+Shop cards rebuilt to the hotels site's card: rounded-2xl on a ring that turns
+gold on hover, the lift and shadow, a 3:2 cover that scales slightly under the
+cursor, a dark gradient over it, and the trade and open/closed pills floating
+on the photograph instead of taking lines away from the name. Body is p-5 with
+a gap-3 stack, matching the hotel card's rhythm.
+
 ## 2026-08-21 03:31 — hamakali2005 · done
 
 Shop photographs are 3:2 now, the same ratio the hotels site uses. The

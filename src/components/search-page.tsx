@@ -371,28 +371,48 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
 
   return (
     <li
-      className="pop-in overflow-hidden rounded-2xl border border-border bg-card"
+      className="pop-in group relative h-full overflow-hidden rounded-2xl bg-card shadow-lg shadow-black/5 ring-1 ring-foreground/10 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:ring-gold/40 active:scale-[0.99]"
       style={{ animationDelay: `${Math.min(index, 8) * 28}ms` }}
     >
       {/* The photograph, when there is one. Most shops will not have one for
           a long time, so the card below has to stand on its own — this is an
           addition to it rather than the thing it is built around.
 
-          One ratio for every card, the same 3:2 the hotels site uses, so the
-          picture stays in proportion to the lines underneath it and no card
-          towers over its neighbours. */}
+          Built to the hotels site's card: one 3:2 frame, the cover cropped to
+          fill it so every card reads the same weight, and what would otherwise
+          be a line of text — the trade, whether the door is open — floating on
+          the picture instead of pushing the name further down. */}
       {shop.photo && (
         <div className="relative aspect-[3/2] overflow-hidden bg-muted">
           <img
             src={mediaSrc(shop.photo)}
             alt=""
             loading="lazy"
-            className="size-full object-cover"
+            className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
+          {/* Keeps white lettering legible over a pale sky or a lit sign. */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 to-transparent" />
+
+          {cat && (
+            <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 text-xs font-semibold text-white shadow-lg ring-1 ring-white/15 backdrop-blur-md">
+              <Icon className="size-3.5" aria-hidden />
+              {cat.label.ku}
+            </span>
+          )}
+
+          {open !== null && (
+            <span
+              className={`absolute bottom-3 end-3 inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold text-white shadow-lg ring-1 ring-white/15 backdrop-blur-md ${
+                open ? "bg-emerald-600/85" : "bg-red-600/85"
+              }`}
+            >
+              {open ? "ئێستا کراوەیە" : "داخراوە"}
+            </span>
+          )}
         </div>
       )}
 
-      <div className={shop.photo ? "p-4 pt-2" : "p-4"}>
+      <div className="flex flex-col gap-3 p-5">
         <div className="flex items-start gap-3">
           {!shop.photo && (
             <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-accent">
@@ -400,22 +420,26 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
             </span>
           )}
           <div className="min-w-0 flex-1">
-            <h2 className="truncate font-bold">{shop.name.ku}</h2>
-            <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-              <MapPin className="size-3 shrink-0" aria-hidden />
-              <span className="truncate">{where}</span>
-            </p>
-            {hours && (
-              <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-                <Clock className="size-3 shrink-0" aria-hidden />
-                <span dir="ltr">{hours}</span>
-              </p>
-            )}
+            <h2 className="line-clamp-1 text-lg font-bold">{shop.name.ku}</h2>
+            <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm text-muted-foreground">
+              <span className="inline-flex min-w-0 items-center gap-1">
+                <MapPin className="size-3.5 shrink-0" aria-hidden />
+                <span className="truncate">{where}</span>
+              </span>
+              {hours && (
+                <span className="inline-flex items-center gap-1">
+                  <Clock className="size-3.5 shrink-0" aria-hidden />
+                  <span dir="ltr">{hours}</span>
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Only shown when the shop has actually given its hours. Silence
-              means we do not know, which must never be drawn as "closed". */}
-          {open !== null && (
+              means we do not know, which must never be drawn as "closed".
+              With a photograph this rides on it instead, out of the way of
+              the name. */}
+          {!shop.photo && open !== null && (
             <span
               className={`shrink-0 rounded-full px-2.5 py-1 text-[0.7rem] font-bold ${
                 open
@@ -429,11 +453,11 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
         </div>
 
         {shop.tags && shop.tags.length > 0 && (
-          <ul className="mt-3 flex flex-wrap gap-1.5">
+          <ul className="flex flex-wrap gap-1.5">
             {shop.tags.slice(0, 5).map((t) => (
               <li
                 key={t}
-                className="rounded-full bg-muted px-2.5 py-1 text-[0.7rem] text-muted-foreground"
+                className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground"
               >
                 {t}
               </li>
@@ -443,7 +467,7 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
 
         {/* Ringing is the one every shop can answer, so it keeps the filled
             button; the other two appear only when the shop gave them. */}
-        <div className="mt-3 grid gap-2 sm:grid-cols-3">
+        <div className="grid gap-2 sm:grid-cols-3">
           <a
             href={`tel:${shop.phone.replace(/s/g, "")}`}
             className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
