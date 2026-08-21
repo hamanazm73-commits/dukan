@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import {
   Clock,
@@ -637,7 +638,7 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
 
         {/* Ringing is the one every shop can answer, so it keeps the filled
             button; the other two appear only when the shop gave them. */}
-        <div className="grid gap-2 sm:grid-cols-3">
+        <div className="relative z-10 grid gap-2 sm:grid-cols-3">
           <a
             href={`tel:${shop.phone.replace(/s/g, "")}`}
             className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
@@ -671,6 +672,21 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
           )}
         </div>
       </div>
+
+      {/*
+        The card itself opens the shop's own page.
+
+        Stretched over the whole card and underneath the three buttons, so a
+        tap anywhere that is not a button opens the shop, and a tap on Call
+        still calls. This is the only route to that page — there is no list
+        and no menu — but it is what makes a shop something that can be sent
+        to somebody rather than only found.
+      */}
+      <Link
+        href={`/shops/${shop.id}`}
+        aria-label={shop.name.ku || shop.name.en}
+        className="absolute inset-0 z-0"
+      />
     </li>
   );
 }
