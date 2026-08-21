@@ -10,6 +10,12 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 14:10 — hamakali2005 · done
+
+Arabic and English names brought in line with the Kurdish: يم حمة تلاقيها and
+Find It at Lay Hama, replacing يم حمة للمحلات and Lay Hama Shops in the
+organisation data. Same change in the hub.
+
 ## 2026-08-21 13:57 — hamakali2005 · done
 
 **Removed the family links from the shop page**, the same row Hama asked to

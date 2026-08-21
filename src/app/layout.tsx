@@ -68,7 +68,7 @@ const ORGANIZATION_JSON_LD = {
   "@type": "Organization",
   "@id": `${SITE_URL}/#organization`,
   name: "لای حەمە بیدۆزەوە",
-  alternateName: ["Lay Hama Shops", "يم حمة للمحلات"],
+  alternateName: ["Find It at Lay Hama", "يم حمة تلاقيها"],
   url: SITE_URL,
   description: DESCRIPTION,
   parentOrganization: { "@id": `${HUB_URL}/#organization` },
