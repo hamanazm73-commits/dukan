@@ -154,7 +154,7 @@
 }
 .field:focus-within .field-inner {
   box-shadow:
-    0 0 0 4px rgba(223, 178, 80, 0.28),
+    0 0 0 4px rgba(231, 186, 84, 0.28),
     0 18px 44px -16px rgba(0, 0, 0, 0.6);
 }
 
@@ -243,7 +243,7 @@
   height: 1.05em;
   vertical-align: -0.16em;
   margin-inline-start: 2px;
-  background: #dfb250;
+  background: #e7ba54;
   animation: caret-blink 1.05s step-end infinite;
 }
 
@@ -278,9 +278,9 @@
   background: conic-gradient(
     from 0deg,
     transparent 0 60%,
-    rgba(223, 178, 80, 0.55) 74%,
+    rgba(231, 186, 84, 0.55) 74%,
     #fff3d6 81%,
-    rgba(223, 178, 80, 0.55) 88%,
+    rgba(231, 186, 84, 0.55) 88%,
     transparent 96% 100%
   );
   animation: field-turn 5s linear infinite;
@@ -313,6 +313,6 @@
   /* A still ring instead of a turning one, so the field keeps its edge. */
   .field::before {
     animation: none;
-    background: rgba(223, 178, 80, 0.5);
+    background: rgba(231, 186, 84, 0.5);
   }
 }

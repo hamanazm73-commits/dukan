@@ -4,7 +4,7 @@
  * the motif in the middle changes — that is what makes them one family.
  */
 
-const GOLD = "#DFB250";
+const GOLD = "#e7ba54";
 const STAR_D =
   "M50 20 l2.3 4.8 5.3.8-3.8 3.7 1 5.3-4.8-2.5-4.8 2.5 1-5.3-3.8-3.7 5.3-.8Z";
 const place = (cx: number, cy: number, s: number) =>
