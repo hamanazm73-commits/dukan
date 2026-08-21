@@ -8,6 +8,7 @@ import {
   Plus_Jakarta_Sans,
 } from "next/font/google";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 
 // The same pairing as the two sister sites: Jakarta for Latin, Naskh for
 // Kurdish and Arabic. Half of what makes them read as one family.
@@ -126,6 +127,14 @@ export default async function RootLayout({
           }}
         />
         <LocaleProvider initial={locale}>{children}</LocaleProvider>
+        {/*
+          How many people actually come.
+          Counts a page view and nothing else — no cookie, no identifier, no
+          profile, so there is nothing to put a consent banner in front of.
+          Turn it on per project at Vercel > Analytics; until then this sends
+          nothing and costs nothing.
+        */}
+        <Analytics />
       </body>
     </html>
   );
