@@ -115,6 +115,13 @@ export async function POST(req: Request) {
   }
 
   try {
+    // One line, until this is understood: if the trades never reached the
+    // model, a null answer is the only correct one it could give.
+    console.error(
+      "[interpret] prompt chars:", SYSTEM.length,
+      "keys:", KEYS.length,
+      "first:", KEYS[0],
+    );
     const response = await anthropic.messages.parse({
       model: "claude-opus-5",
       /*
