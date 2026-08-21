@@ -47,9 +47,12 @@ The shopper writes in Kurdish Sorani, Arabic, or English, often misspelled,
 often naming a thing rather than a trade — "ئایفۆن" means the mobile trade,
 "گوڵی سوور" means the florist, "دەرمانی سەرئێشە" means the pharmacy.
 
-Pick the trade that would actually sell the thing. If none of these trades
-would, return null rather than the closest one — a wrong shop is worse than
-an honest empty result.`;
+Answer with exactly one key from the list above — the trade that would
+actually sell the thing.
+
+Use null only when nothing on that list sells it at all: a plane ticket, a
+bank loan, a hotel room. Being unsure between two trades is not a reason for
+null; pick the likelier one.`;
 
 /** One instance per warm lambda; the SDK reads ANTHROPIC_API_KEY itself. */
 let client: Anthropic | null = null;
@@ -152,17 +155,33 @@ export async function POST(req: Request) {
         reason: "unparsed",
       });
     }
-    // A null answer is a real answer — "no trade here sells that" — but it is
-    // also what a truncated turn looks like. Recording why the turn ended is
-    // what separates them; `max_tokens` here means the allowance ran out
-    // rather than the model having decided anything.
-    if (!parsed.category) {
-      console.error("[interpret] null category, stop:", response.stop_reason);
+    /*
+     * Checked here, because the schema does not check it.
+     *
+     * `z.enum(KEYS)` reads like a constraint and is not one: this SDK strips
+     * every keyword except type, anyOf, items, properties, required and
+     * additionalProperties on its way to the API, and `enum` is not on that
+     * list. It survives only as a note inside `description`. So the model is
+     * handed a free-form string and asked nicely — which is exactly what it
+     * behaved like, answering null to every query for a day.
+     *
+     * The keys are named in the system prompt, so a good answer arrives
+     * anyway. This is what makes a bad one safe: anything that is not one of
+     * the sixteen becomes null rather than a category key the rest of the
+     * site would search for and never find.
+     */
+    const category =
+      parsed.category && KEYS.includes(parsed.category) ? parsed.category : null;
+
+    if (!category) {
+      console.error(
+        "[interpret] no category, stop:",
+        response.stop_reason,
+        "raw:",
+        parsed.category,
+      );
     }
-    return NextResponse.json({
-      category: parsed.category,
-      terms: parsed.terms ?? [],
-    });
+    return NextResponse.json({ category, terms: parsed.terms ?? [] });
   } catch (err) {
     // A failure here must read as "found nothing", never as a broken site.
     console.error("[interpret] failed:", err);
