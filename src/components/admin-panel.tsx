@@ -735,12 +735,12 @@ function PhotoField({
       {value ? (
         <div className="relative overflow-hidden rounded-xl border border-border">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          {/* Shown whole, and at the same proportions the card will use, so
-              what the owner approves here is what a customer gets. */}
+          {/* Shown whole and at full width, the same as the card, so what the
+              owner approves here is what a customer gets. */}
           <img
             src={mediaSrc(value)}
             alt=""
-            className="block max-h-[26rem] w-full bg-muted object-contain"
+            className="block h-auto w-full bg-muted"
           />
           <button
             type="button"

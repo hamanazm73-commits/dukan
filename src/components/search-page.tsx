@@ -384,16 +384,20 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
           room — is rarely the shape of a strip; the sign that names the place
           was the first thing cut off.
 
-          max-h is the one guard: a very tall picture is scaled down and
-          letterboxed against the muted panel instead of taking over the whole
-          screen. Nothing is cropped in either case. */}
+          Width first, and no height limit. A capped height was tried and it
+          fails on a wide screen for exactly the reason a crop fails on a
+          narrow one: at 640px across, a near-square photo hit the cap and sat
+          in the middle of the card with a bar of empty panel down each side.
+          Full width, height following the picture's own proportions, and the
+          card grows to hold it. Cards no longer match each other in height —
+          that is the price of never cutting one. */}
       {shop.photo && (
         <div className="relative bg-muted">
           <img
             src={mediaSrc(shop.photo)}
             alt=""
             loading="lazy"
-            className="block max-h-[26rem] w-full object-contain"
+            className="block h-auto w-full"
           />
         </div>
       )}

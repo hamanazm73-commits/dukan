@@ -10,6 +10,21 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 03:28 — hamakali2005 · done
+
+**Photographs fill the card's width now.** The height cap added earlier failed
+on a wide screen for the same reason a crop fails on a narrow one: at 640px
+across, a near-square photo hit the cap and sat in the middle with a bar of
+empty panel down each side. No cap at all now — full width, height following
+the picture's own proportions.
+
+Measured: 638x581 in a 638px card and 341x311 in a 341px one, both at the
+photo's exact ratio, no side bars, nothing off-screen at 375px.
+
+The trade this makes: cards no longer match each other in height, unlike the
+hotels site, which crops to aspect-[3/2] so every card reads the same weight.
+That uniformity and never cutting a photograph cannot both be had.
+
 ## 2026-08-21 03:23 — hamakali2005 · done
 
 **Shop photographs were being cropped.** The card held them in a fixed 144px
