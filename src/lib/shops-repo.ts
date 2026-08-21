@@ -42,7 +42,39 @@ function defined<T extends object>(data: T): T {
   ) as T;
 }
 
+/**
+ * The shop list, for the public search.
+ *
+ * Through this site rather than straight to Firestore. The direct read cost
+ * one Firestore document read per shop **per visitor**, against a free
+ * allowance of 50,000 a day — so the site's capacity fell as its content grew:
+ * 100 shops meant 500 visitors a day, 500 shops meant 100. /api/shops reads
+ * the collection once an hour and hands the same answer to everyone.
+ *
+ * The seed still answers when the route cannot: a site that shows nothing is
+ * worse than one showing what it shipped with.
+ */
 export async function loadShops(): Promise<{ shops: Shop[]; live: boolean }> {
+  try {
+    const res = await fetch("/api/shops");
+    if (!res.ok) return { shops: SHOPS, live: false };
+    const { shops } = (await res.json()) as { shops: Shop[] };
+    if (!shops?.length) return { shops: SHOPS, live: false };
+    return { shops, live: true };
+  } catch (e) {
+    console.error("[shops] list read failed, falling back to seed:", e);
+    return { shops: SHOPS, live: false };
+  }
+}
+
+/**
+ * The same list, read straight from Firestore, for the dashboard.
+ *
+ * Somebody who has just saved a shop has to see it, and an hour-old answer
+ * would look like the save had failed. There are two people using this and
+ * thousands using the search, so the expensive read belongs here.
+ */
+export async function loadShopsFresh(): Promise<{ shops: Shop[]; live: boolean }> {
   const db = getDbOrNull();
   if (!firebaseEnabled || !db) return { shops: SHOPS, live: false };
 

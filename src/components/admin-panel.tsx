@@ -20,7 +20,7 @@ import { useAuth } from "@/lib/auth";
 import {
   createShop,
   deleteShop,
-  loadShops,
+  loadShopsFresh,
   updateShop,
   type ShopDraft,
 } from "@/lib/shops-repo";
@@ -183,7 +183,7 @@ function Dashboard({
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const r = await loadShops();
+    const r = await loadShopsFresh();
     setShops(r.shops);
     setLive(r.live);
     setLoading(false);
