@@ -15,6 +15,8 @@ import {
 import * as Icons from "lucide-react";
 import { CATEGORIES, CITY_NAMES, SHOPS, type Shop } from "@/lib/data";
 import { CITY_KEYS, useHomeCity } from "@/lib/city";
+import { LOCALES, dict } from "@/lib/i18n";
+import { useLocale } from "@/lib/locale";
 import { createSearcher } from "@/lib/search";
 import { hoursLabel, isOpenNow } from "@/lib/hours";
 import { mediaSrc } from "@/lib/media";
@@ -35,32 +37,16 @@ function iconFor(name: string): LucideIcon {
  * offered is the placeholder inside the box, because that is part of the box
  * rather than an alternative to using it.
  */
-/**
- * What the empty field offers, one at a time.
+/*
+ * The examples under the empty field, and the line it opens with, both live
+ * in `i18n.ts` now — one set per language.
  *
- * Things, not shop types. Nobody wakes up wanting "a florist" — they want
- * red roses, and the shop is only how they get them. Showing "گوڵفرۆش" here
- * taught people to search the way the database is filed; showing "گوڵی سوور"
- * teaches them to search the way they already think.
+ * They are things, not shop types. Nobody wakes up wanting "a florist" — they
+ * want red roses, and the shop is only how they get them. Showing "گوڵفرۆش"
+ * there taught people to search the way the database is filed; "گوڵی سوور"
+ * teaches them to search the way they already think. The Arabic and English
+ * lists say the same things in the same spirit, not word for word.
  */
-const HINTS = [
-  "ئایفۆن ١٧…",
-  "گوڵی سوور…",
-  "دەرمانی سەرئێشە…",
-  "کەبابی برژاو…",
-  "ئەڵقەی زەماوەند…",
-  "تایەی ئۆتۆمبێل…",
-  "کێکی ساڵیاد…",
-];
-
-/**
- * The line the field opens with, typed out a letter at a time.
- *
- * It says the two halves of the bargain — what to do, and what comes back —
- * and it fits inside a phone-width field, which the longer sentences that
- * mean the same thing do not.
- */
-const OPENING = "بینووسە، بیدۆزەرەوە";
 
 /**
  * What the interpreter has already been asked, for this tab's lifetime.
@@ -73,6 +59,11 @@ const OPENING = "بینووسە، بیدۆزەرەوە";
 const AI_CACHE = new Map<string, string | null>();
 
 export function SearchPage() {
+  const { locale, setLocale, t } = useLocale();
+  const words = dict(locale);
+  const OPENING = words.opening;
+  const HINTS = words.hints;
+
   const [query, setQuery] = useState("");
   const [shops, setShops] = useState<Shop[]>(SHOPS);
   const [hintIndex, setHintIndex] = useState(0);
@@ -82,6 +73,13 @@ export function SearchPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const opening = typed_ >= 0;
   const hint = opening ? OPENING.slice(0, typed_) : HINTS[hintIndex];
+
+  // Switching language mid-animation would leave half of one sentence
+  // followed by half of another, so the opening starts over.
+  useEffect(() => {
+    setTyped_(0);
+    setHintIndex(0);
+  }, [locale]);
 
   // The opening types itself, holds, then hands over to the examples. Anyone
   // who has asked for less motion gets it whole, immediately.
@@ -101,7 +99,7 @@ export function SearchPage() {
     }
     const hold = setTimeout(() => setTyped_(-1), 2600);
     return () => clearTimeout(hold);
-  }, [query, opening, typed_]);
+  }, [query, opening, typed_, OPENING]);
 
   // Only while the field is empty — once someone is typing, a word appearing
   // and vanishing underneath them is noise.
@@ -112,7 +110,7 @@ export function SearchPage() {
       2600,
     );
     return () => clearInterval(id);
-  }, [query, opening]);
+  }, [query, opening, HINTS.length]);
 
   // Start on the seed so the first paint can already search, then swap in the
   // real shops once they arrive. Nothing blocks on the network: a visitor who
@@ -212,8 +210,10 @@ export function SearchPage() {
      written, not a second set living next to them. */
   const aiResult = useMemo(
     () =>
-      aiCategory ? searcher(aiCategory.label.ku, home.city ?? undefined) : null,
-    [aiCategory, searcher, home.city],
+      aiCategory
+        ? searcher(aiCategory.label[locale], home.city ?? undefined)
+        : null,
+    [aiCategory, searcher, home.city, locale],
   );
 
   const hasHits = (r: typeof result) =>
@@ -243,6 +243,30 @@ export function SearchPage() {
       {/* The page is as wide as the hotels site so the results can sit three
           abreast, but the mark and the field stay in a 2xl column down the
           middle. A search box stretched across a desktop is a worse box. */}
+      {/* Three words in the corner, not a dropdown.
+          There are only three and each is written in its own script, so the
+          choice reads itself — a select would hide two of them behind a tap
+          and give an empty page a control to operate before anything has
+          been asked. */}
+      <div className="absolute end-4 top-4 z-30 flex items-center gap-1 sm:end-6">
+        {LOCALES.map((l) => (
+          <button
+            key={l.code}
+            type="button"
+            onClick={() => setLocale(l.code)}
+            aria-current={l.code === locale}
+            title={t("language")}
+            className={`rounded-full px-2.5 py-1 text-xs transition-colors ${
+              l.code === locale
+                ? "bg-gold/15 font-bold text-gold"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            }`}
+          >
+            {l.label}
+          </button>
+        ))}
+      </div>
+
       <div
         className={`mx-auto flex w-full max-w-2xl flex-col items-center text-center transition-all duration-500 ${
           typed ? "pt-8 pb-5" : "pt-0 pb-12"
@@ -276,7 +300,7 @@ export function SearchPage() {
               typed ? "text-3xl" : "text-[2.9rem] sm:text-[4.2rem]"
             }`}
           >
-            لای حەمە بیدۆزەوە
+            {t("brand")}
           </h1>
         </div>
 
@@ -285,7 +309,7 @@ export function SearchPage() {
             className="arrive mt-3 max-w-xs text-balance text-lg font-normal leading-relaxed text-white/55 sm:max-w-md sm:text-xl"
             style={{ animationDelay: "300ms" }}
           >
-            نووسین لە تۆ، گەڕان و دۆزینەوە لە ئێمە
+            {t("tagline")}
           </p>
         )}
       </div>
@@ -305,7 +329,7 @@ export function SearchPage() {
               inputMode="search"
               enterKeyHint="search"
               autoComplete="off"
-              aria-label="بگەڕێ بۆ دووکان"
+              aria-label={t("searchLabel")}
               className="h-16 w-full bg-transparent text-base outline-none"
             />
             {/* Standing in for the placeholder so one example can fade into
@@ -332,7 +356,7 @@ export function SearchPage() {
                 setQuery("");
                 inputRef.current?.focus();
               }}
-              aria-label="سڕینەوە"
+              aria-label={t("clear")}
               className="grid size-9 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <X className="size-4" />
@@ -354,11 +378,11 @@ export function SearchPage() {
               className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs text-foreground transition-colors hover:bg-muted"
             >
               <MapPin className="size-3.5 shrink-0 text-gold" aria-hidden />
-              {home.city ? CITY_NAMES[home.city].ku : "شارەکەت دیاری بکە"}
+              {home.city ? CITY_NAMES[home.city][locale] : t("pickCity")}
             </button>
             {home.status === "locating" && (
               <span className="text-xs text-muted-foreground">
-                شوێنەکەت دەدۆزرێتەوە…
+                {t("locating")}
               </span>
             )}
           </div>
@@ -382,7 +406,7 @@ export function SearchPage() {
           {pickerOpen && (
             <div className="mb-3 rounded-2xl border border-border bg-card p-3">
               <p className="mb-2 text-xs text-muted-foreground">
-                لە کام شاردایت؟
+                {t("whichCity")}
               </p>
               {/* Wraps rather than scrolls: twelve names must all be reachable
                   on a 375px screen without a hidden row. */}
@@ -401,7 +425,7 @@ export function SearchPage() {
                         : "border-border text-muted-foreground hover:bg-muted hover:text-foreground"
                     }`}
                   >
-                    {CITY_NAMES[key].ku}
+                    {CITY_NAMES[key][locale]}
                   </button>
                 ))}
                 <button
@@ -416,7 +440,7 @@ export function SearchPage() {
                       : "border-border text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
                 >
-                  هەموو شارەکان
+                  {t("allCities")}
                 </button>
               </div>
             </div>
@@ -425,20 +449,24 @@ export function SearchPage() {
           <p className="mb-3 text-xs text-muted-foreground">
             {list.length > 0 ? (
               <>
-                <span className="font-bold text-foreground">{list.length}</span>{" "}
-                دووکان
+                {t(list.length === 1 ? "shopFound" : "shopsFound", {
+                  n: list.length,
+                })}
                 {shown.category && (
                   <>
                     {" "}
-                    لە <span className="text-gold">{shown.category.label.ku}</span>
+                    {t("inCategory")}{" "}
+                    <span className="text-gold">{shown.category.label[locale]}</span>
                   </>
                 )}
                 {/* A city named in the query is worth repeating back. The one
                     we chose for them is already on the button above. */}
-                {shown.city && <> لە {CITY_NAMES[shown.city].ku}</>}
+                {shown.city && (
+                  <> {t("inCity")} {CITY_NAMES[shown.city][locale]}</>
+                )}
               </>
             ) : (
-              "هیچ نەدۆزرایەوە"
+              t("nothingFound")
             )}
           </p>
 
@@ -450,11 +478,7 @@ export function SearchPage() {
             <div className="mb-3 flex items-start gap-2 rounded-2xl border border-gold/25 bg-gold/[0.06] p-3">
               <Sparkles className="mt-0.5 size-4 shrink-0 text-gold" aria-hidden />
               <p className="text-xs leading-relaxed text-muted-foreground">
-                ئەم وشەیە لە لیستەکەماندا نەبوو. وامان لێکدایەوە کە مەبەستت{" "}
-                <span className="font-bold text-gold">
-                  {aiCategory.label.ku}
-                </span>{" "}
-                بووە.
+                {t("aiRead", { cat: aiCategory.label[locale] })}
               </p>
             </div>
           )}
@@ -464,10 +488,9 @@ export function SearchPage() {
           {fallback && shown.homeCity && (
             <div className="mb-3 rounded-2xl border border-dashed border-border p-4 text-center">
               <p className="text-sm leading-relaxed text-muted-foreground">
-                لە <span className="text-foreground">{CITY_NAMES[shown.homeCity].ku}</span>{" "}
-                نەدۆزرایەوە.
+                {t("notHere", { city: CITY_NAMES[shown.homeCity][locale] })}
                 <br />
-                بەڵام لە شارەکانی تر هەیە:
+                {t("butElsewhere")}
               </p>
             </div>
           )}
@@ -479,13 +502,13 @@ export function SearchPage() {
               {aiBusy ? (
                 <p className="inline-flex items-center gap-2 text-sm text-muted-foreground">
                   <Sparkles className="size-4 animate-pulse text-gold" aria-hidden />
-                  لێی تێدەگەین…
+                  {t("aiThinking")}
                 </p>
               ) : (
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  هیچ دووکانێک بەم ناوە نەدۆزرایەوە.
+                  {t("nothingLong")}
                   <br />
-                  بە شێوەیەکی تر بینووسە، یان ناوی شارەکەشی لەگەڵ بنووسە.
+                  {t("nothingHint")}
                 </p>
               )}
             </div>
@@ -504,12 +527,13 @@ export function SearchPage() {
 }
 
 function ShopCard({ shop, index }: { shop: Shop; index: number }) {
+  const { locale, t } = useLocale();
   const cat = CATEGORIES.find((c) => c.key === shop.category);
   const Icon = iconFor(cat?.icon ?? "Store");
   const wa = shop.whatsapp ? `https://wa.me/${shop.whatsapp}` : undefined;
   const open = isOpenNow(shop.opensAt, shop.closesAt);
   const hours = hoursLabel(shop.opensAt, shop.closesAt);
-  const where = [CITY_NAMES[shop.city].ku, shop.district?.ku]
+  const where = [CITY_NAMES[shop.city][locale], shop.district?.[locale]]
     .filter(Boolean)
     .join(" — ");
 
@@ -540,7 +564,7 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
           {cat && (
             <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 text-xs font-semibold text-white shadow-lg ring-1 ring-white/15 backdrop-blur-md">
               <Icon className="size-3.5" aria-hidden />
-              {cat.label.ku}
+              {cat.label[locale]}
             </span>
           )}
 
@@ -550,7 +574,7 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
                 open ? "bg-emerald-600/85" : "bg-red-600/85"
               }`}
             >
-              {open ? "ئێستا کراوەیە" : "داخراوە"}
+              {open ? t("openNow") : t("closedNow")}
             </span>
           )}
         </div>
@@ -564,7 +588,7 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
             </span>
           )}
           <div className="min-w-0 flex-1">
-            <h2 className="line-clamp-1 text-lg font-bold">{shop.name.ku}</h2>
+            <h2 className="line-clamp-1 text-lg font-bold">{shop.name[locale]}</h2>
             <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm text-muted-foreground">
               <span className="inline-flex min-w-0 items-center gap-1">
                 <MapPin className="size-3.5 shrink-0" aria-hidden />
@@ -591,7 +615,7 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
                   : "bg-red-600/15 text-red-500"
               }`}
             >
-              {open ? "ئێستا کراوەیە" : "داخراوە"}
+              {open ? t("openNow") : t("closedNow")}
             </span>
           )}
         </div>
@@ -617,7 +641,7 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
             className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
           >
             <Phone className="size-4" aria-hidden />
-            پەیوەندی
+            {t("call")}
           </a>
           {wa && (
             <a
@@ -629,7 +653,7 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
               <svg viewBox="0 0 24 24" fill="currentColor" className="size-4" aria-hidden>
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347" />
               </svg>
-              واتساپ
+              {t("whatsapp")}
             </a>
           )}
           {shop.mapUrl && (
@@ -640,7 +664,7 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
               className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border px-4 text-sm font-bold transition-colors hover:bg-muted"
             >
               <MapIcon className="size-4" aria-hidden />
-              ڕێگا
+              {t("directions")}
             </a>
           )}
         </div>
@@ -657,7 +681,7 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
       */}
       <Link
         href={`/shops/${shop.id}`}
-        aria-label={shop.name.ku || shop.name.en}
+        aria-label={shop.name[locale] || shop.name.ku || shop.name.en}
         className="absolute inset-0 z-0"
       />
     </li>
@@ -686,6 +710,7 @@ function CityAsk({
   onAllow: () => void;
   onDecline: () => void;
 }) {
+  const { t } = useLocale();
   const allowRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -727,15 +752,13 @@ function CityAsk({
             <MapPin className="size-7 text-gold" aria-hidden />
           </span>
           <h2 id="city-ask-title" className="mt-4 text-lg font-bold">
-            نزیکترین دووکانت پیشان بدەین؟
+            {t("askTitle")}
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            ئەگەر شارەکەت بزانین، ئەو دووکانانەت پیشان دەدەین کە لە شارەکەی
-            خۆتدان — نەک شارێکی دوور.
+            {t("askBody")}
           </p>
           <p className="mt-3 text-xs leading-relaxed text-muted-foreground/80">
-            تەنها ناوی شارەکە بەکاردێت. لە وێبگەڕەکەی خۆتدا دەمێنێتەوە و بۆ
-            هیچ شوێنێک نانێردرێت.
+            {t("askPrivacy")}
           </p>
         </div>
         <div className="grid gap-2 border-t border-border p-4">
@@ -745,14 +768,14 @@ function CityAsk({
             onClick={onAllow}
             className="h-12 rounded-xl bg-gold text-sm font-bold text-gold-foreground transition-opacity hover:opacity-90"
           >
-            بەڵێ، شارەکەم بدۆزەوە
+            {t("askYes")}
           </button>
           <button
             type="button"
             onClick={onDecline}
             className="h-11 rounded-xl text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted"
           >
-            ئێستا نا
+            {t("askNo")}
           </button>
         </div>
       </div>

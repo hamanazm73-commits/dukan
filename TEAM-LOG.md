@@ -10,6 +10,35 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 — hamakali2005 · done
+
+**The site speaks Arabic and English now, not only Kurdish.** Hama asked for
+this twice; the first time I heard "rename the card" and renamed the card,
+which was not it.
+
+`i18n.ts` holds one dictionary in three languages and no `"use client"`, so
+the server can read it too. `locale.tsx` holds the provider. The choice is a
+**cookie**: the shop pages are server-rendered, so a language the browser alone
+knew about would leave `/shops/…` in Kurdish for an English reader and flash
+the wrong direction on every load. The layout reads it and sets `lang`/`dir`
+before the first paint.
+
+Everything visible follows it — the field, the city picker, the permission
+card, the counts, the AI notice, the card, and the shop page. Shop names,
+trades and cities come out of the data in the chosen language.
+
+Verified: `ckb/rtl`, `ar/rtl`, `en/ltr` on both the search page and
+`/shops/…`; switching is instant and survives a reload; "1 shop" not
+"1 shops"; nothing off-screen at 375px.
+
+**One thing I got wrong on the way, again:** `localeFromCookie` started in the
+`"use client"` module and the layout threw on every request. Same mistake as
+`nearestCity` earlier this morning. Anything the server needs belongs in a file
+with no directive on it.
+
+Metadata and the canonical stay Kurdish deliberately — that is the language
+this site is indexed in.
+
 ## 2026-08-21 14:10 — hamakali2005 · done
 
 Arabic and English names brought in line with the Kurdish: يم حمة تلاقيها and

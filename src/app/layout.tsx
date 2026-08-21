@@ -1,4 +1,7 @@
 import type { Metadata, Viewport } from "next";
+import { cookies } from "next/headers";
+import { LOCALE_COOKIE, dirOf, htmlLang, localeFromCookie } from "@/lib/i18n";
+import { LocaleProvider } from "@/lib/locale";
 import {
   Aref_Ruqaa,
   Noto_Naskh_Arabic,
@@ -79,11 +82,22 @@ const ORGANIZATION_JSON_LD = {
   address: { "@type": "PostalAddress", addressCountry: "IQ" },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  /* Read here rather than in the browser so the first paint is already in the
+     right language and the right direction — a page that arrives Kurdish and
+     turns English is worse than one that was slow. */
+  const store = await cookies();
+  const locale = localeFromCookie(store.get(LOCALE_COOKIE)?.value);
+
   return (
-    <html lang="ku" dir="rtl" className="dark" suppressHydrationWarning>
+    <html
+      lang={htmlLang(locale)}
+      dir={dirOf(locale)}
+      className="dark"
+      suppressHydrationWarning
+    >
       <body
         className={`${sans.variable} ${arabic.variable} ${display.variable} min-h-dvh`}
       >
@@ -111,7 +125,7 @@ export default function RootLayout({
             }),
           }}
         />
-        {children}
+        <LocaleProvider initial={locale}>{children}</LocaleProvider>
       </body>
     </html>
   );

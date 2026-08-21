@@ -8,6 +8,8 @@ import { hoursLabel, isOpenNow } from "@/lib/hours";
 import { mediaSrc } from "@/lib/media";
 import { BrandMark } from "@/components/brand-mark";
 import { SITE_URL } from "@/app/layout";
+import { cookies } from "next/headers";
+import { LOCALE_COOKIE, localeFromCookie, t } from "@/lib/i18n";
 
 /**
  * One shop, on a page of its own.
@@ -85,8 +87,12 @@ export default async function ShopPage({
   const shop = await getShop(id);
   if (!shop) notFound();
 
-  const name = shop.name.ku || shop.name.en || shop.name.ar || "";
-  const city = CITY_NAMES[shop.city]?.ku ?? "";
+  /* The page a person reads follows the language they chose; the metadata
+     above stays Kurdish, because that is the canonical and what a crawler
+     files this page under. */
+  const locale = localeFromCookie((await cookies()).get(LOCALE_COOKIE)?.value);
+  const name = shop.name[locale] || shop.name.ku || shop.name.en || "";
+  const city = CITY_NAMES[shop.city]?.[locale] ?? "";
   const cat = categoryOf(shop.category);
   const open = isOpenNow(shop.opensAt, shop.closesAt);
   const hours = hoursLabel(shop.opensAt, shop.closesAt);
@@ -141,7 +147,7 @@ export default async function ShopPage({
         className="inline-flex items-center gap-2 text-sm text-white/50 transition-colors hover:text-gold"
       >
         <BrandMark className="size-7" />
-        گەڕانەوە بۆ گەڕان
+        {t(locale, "backToSearch")}
       </Link>
 
       <article className="mt-6 overflow-hidden rounded-3xl border border-white/10 bg-card">
@@ -164,7 +170,7 @@ export default async function ShopPage({
           <div className="flex flex-wrap items-center gap-2">
             {cat && (
               <span className="rounded-full bg-gold/15 px-3 py-1 text-xs font-bold text-gold">
-                {cat.label.ku}
+                {cat.label[locale]}
               </span>
             )}
             {/* Only when it is known. A shop with no hours recorded must not
@@ -177,7 +183,7 @@ export default async function ShopPage({
                     : "bg-white/10 text-white/50"
                 }`}
               >
-                {open ? "ئێستا کراوەیە" : "ئێستا داخراوە"}
+                {open ? t(locale, "openNow") : t(locale, "closedNow")}
               </span>
             )}
           </div>
@@ -189,7 +195,7 @@ export default async function ShopPage({
           <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
             <MapPin className="size-4 text-gold" aria-hidden />
             {city}
-            {shop.district?.ku && <span>· {shop.district.ku}</span>}
+            {shop.district?.[locale] && <span>· {shop.district[locale]}</span>}
           </p>
 
           {hours && (
@@ -220,7 +226,7 @@ export default async function ShopPage({
               className="flex h-13 items-center justify-center gap-2 rounded-2xl bg-gold px-5 py-3.5 text-sm font-bold text-gold-foreground transition-opacity hover:opacity-90"
             >
               <Phone className="size-4" aria-hidden />
-              پەیوەندی بکە
+              {t(locale, "call")}
             </a>
             {wa && (
               <a
@@ -229,7 +235,7 @@ export default async function ShopPage({
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-5 py-3.5 text-sm font-bold text-white transition-opacity hover:opacity-90"
               >
-                واتساپ
+                {t(locale, "whatsapp")}
               </a>
             )}
             {shop.mapUrl && (
@@ -240,7 +246,7 @@ export default async function ShopPage({
                 className="flex items-center justify-center gap-2 rounded-2xl border border-white/15 px-5 py-3.5 text-sm font-semibold text-white/80 transition-colors hover:bg-white/5 sm:col-span-2"
               >
                 <MapPin className="size-4" aria-hidden />
-                لە نەخشەدا پیشانی بدە
+                {t(locale, "showOnMap")}
               </a>
             )}
           </div>
@@ -254,7 +260,7 @@ export default async function ShopPage({
       {near.length > 0 && (
         <section className="mt-10">
           <h2 className="mb-4 text-sm font-bold text-white/60">
-            دووکانی تر لە {city}
+            {t(locale, "otherShopsIn", { city })}
           </h2>
           <ul className="grid gap-3 sm:grid-cols-2">
             {near.map((s) => (
@@ -268,10 +274,10 @@ export default async function ShopPage({
                   </span>
                   <span className="min-w-0">
                     <span className="block truncate text-sm font-semibold">
-                      {s.name.ku || s.name.en}
+                      {s.name[locale] || s.name.ku || s.name.en}
                     </span>
                     <span className="block truncate text-xs text-muted-foreground">
-                      {categoryOf(s.category)?.label.ku}
+                      {categoryOf(s.category)?.label[locale]}
                     </span>
                   </span>
                 </Link>
