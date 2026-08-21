@@ -10,6 +10,15 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 15:44 — hamakali2005 · done
+
+Language control moved to the top centre, where the hub keeps its. Dead centre
+at both 375px and 1265px, sitting at top 20 with the mark at 146 — clear of it,
+nothing off screen.
+
+Also ran `npm install` here: `b9a30dc` added `@vercel/analytics` and this clone
+had not picked it up, so the build failed on the import until it did.
+
 ## 2026-08-21 15:39 — hamakali2005 · done
 
 **The language control is the hub's now**, lifted whole rather than

@@ -247,7 +247,7 @@ export function SearchPage() {
       {/* The hub's language control, lifted whole rather than approximated —
           same pill, same globe, same gold on the chosen one. Four sites that
           each invent their own version of this stop reading as one family. */}
-      <div className="absolute end-4 top-4 z-30 sm:end-6">
+      <div className="absolute inset-x-0 top-5 z-30 flex justify-center px-4">
         <div className="inline-flex items-center gap-1 rounded-full border border-white/12 bg-black/25 p-1 backdrop-blur-md">
           <Globe className="mx-2 size-4 shrink-0 text-white/40" aria-hidden />
           {LOCALES.map((l) => (
