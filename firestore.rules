@@ -1,0 +1,77 @@
+rules_version = '2';
+
+// ---------------------------------------------------------------------------
+// Deploy: Firebase console > Firestore Database > Rules > paste > Publish.
+//
+// Pushing this file changes nothing. Firestore reads the rules the console
+// holds, not the ones in the repository, so a change here is only a proposal
+// until somebody pastes it. The copy lives here so both sides can see what is
+// supposed to be in force and diff it against what is.
+//
+// Project: lay-d4576
+// ---------------------------------------------------------------------------
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Everyone allowed to write. Lowercase, and must match whichever address
+    // is signed in through /hq — the site's own gate reads
+    // NEXT_PUBLIC_OWNER_EMAIL, and an address here that is not there gets
+    // past the database and stopped by the screen instead.
+    function admins() {
+      return ["hamanazm73@gmail.com"];
+    }
+
+    function isSignedIn() { return request.auth != null; }
+    function emailLower() { return request.auth.token.email.lower(); }
+    function isAdmin() { return isSignedIn() && emailLower() in admins(); }
+
+    // Shops.
+    //
+    // Read is open to everyone and has to be: the search is the whole site,
+    // it runs in the visitor's browser, and there is nothing in a shop record
+    // that is not already meant to be found — a name, a trade, a city, a
+    // phone number the owner wants ringing.
+    //
+    // Writing is the opposite. One signed-in address, checked here rather
+    // than only in the dashboard, because the dashboard is JavaScript on a
+    // stranger's machine and this is not.
+    match /shops/{id} {
+      allow read: if true;
+
+      allow create: if isAdmin() && validShop(request.resource.data);
+      allow update: if isAdmin() && validShop(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // The shape the dashboard writes. Not a defence against the owner — they
+    // are trusted — but a stop on a malformed record reaching the search,
+    // where a missing city or a name that is not a name breaks the results
+    // for everyone rather than for one document.
+    function validShop(d) {
+      return d.keys().hasOnly([
+               'name', 'category', 'city', 'district', 'phone',
+               'whatsapp', 'tags', 'photo', 'mapUrl', 'opensAt', 'closesAt'
+             ])
+             && d.keys().hasAll(['name', 'category', 'city', 'phone'])
+             && d.name is map
+             && d.name.keys().hasOnly(['ku', 'ar', 'en'])
+             && d.category is string && d.category.size() <= 40
+             && d.city is string && d.city.size() <= 40
+             && d.phone is string && d.phone.size() <= 30
+             && (!('whatsapp' in d.keys()) || (d.whatsapp is string && d.whatsapp.size() <= 30))
+             && (!('district' in d.keys()) || d.district is map)
+             && (!('tags' in d.keys()) || (d.tags is list && d.tags.size() <= 40))
+             && (!('photo' in d.keys()) || (d.photo is string && d.photo.size() <= 300))
+             && (!('mapUrl' in d.keys()) || (d.mapUrl is string && d.mapUrl.size() <= 2000))
+             && (!('opensAt' in d.keys()) || (d.opensAt is string && d.opensAt.size() <= 5))
+             && (!('closesAt' in d.keys()) || (d.closesAt is string && d.closesAt.size() <= 5));
+    }
+
+    // Nothing else in this database is used by this site. Anything that turns
+    // up outside /shops was not put there by the dashboard.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

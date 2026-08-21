@@ -10,6 +10,19 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 03:05 — hamakali2005 · done
+
+**Saving a shop failed with "Missing or insufficient permissions".** Not the
+site: this project never had Firestore rules written for it, unlike aqarat, so
+`lay-d4576` was still on defaults that allow reads and refuse writes — which is
+exactly what it looked like, a directory that opens fine and rejects everything
+you put in it.
+
+Added `firestore.rules`: /shops readable by anyone, written only by a signed-in
+address in `admins()`, with a shape check so a malformed record cannot reach the
+search. **It still has to be pasted into the console** — pushing rules does not
+deploy them.
+
 ## 2026-08-21 02:54 — hamakali2005 · done
 
 **The search is location-first now.** A search returns what is in the
