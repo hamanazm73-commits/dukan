@@ -65,17 +65,66 @@
   --gold-foreground: oklch(0.2 0.03 265);
 }
 
+/* The base layer is the hotels site's, so the two read as one family: the same
+   Naskh lead for Kurdish, the same guards against a phone rewriting the type
+   underneath us, and the same app-like refusal to select body text. */
 @layer base {
   * {
     border-color: var(--border);
+    outline-color: color-mix(in oklch, var(--ring) 50%, transparent);
+  }
+  html {
+    font-family: var(--font-sans), system-ui, sans-serif;
+    /* stop mobile browsers auto-inflating text on rotate or reflow */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
   body {
     background: var(--background);
     color: var(--foreground);
-    /* Latin first, Arabic second: fallback happens per glyph and Jakarta
-       carries no Arabic, so Kurdish falls through to Naskh. */
     font-family: var(--font-sans), var(--font-arabic), system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  /* Whatever a person typed is still theirs to select and copy. */
+  input,
+  textarea,
+  select,
+  [contenteditable] {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+  /* Kurdish leads with Naskh when the page runs right to left, which this one
+     always does. Jakarta carries no Arabic, so this only decides which face
+     sets the Latin sitting inside a Kurdish line. */
+  html[dir="rtl"] body {
+    font-family: var(--font-arabic), var(--font-sans), sans-serif;
+  }
+  /* Every field stays at 16px on a phone so focusing it never triggers iOS
+     Safari's auto-zoom, and the tap target stays big. !important because it
+     has to beat text-xs and text-sm. */
+  @media (max-width: 767px) {
+    input:not([type="checkbox"]):not([type="radio"]),
+    textarea,
+    select {
+      font-size: 16px !important;
+    }
+  }
+}
+
+/* Photographs arrive rather than appear — the hotels site's fade, so a picture
+   landing after its card does not snap into place. */
+.img-fade {
+  animation: img-fade-in 0.4s ease-out both;
+}
+
+@keyframes img-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 

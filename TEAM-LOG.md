@@ -10,6 +10,15 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 03:46 — hamakali2005 · done
+
+Typography brought onto the hotels site's base layer: Naskh leads for Kurdish
+now that the page is always RTL, text-size-adjust pinned so a phone cannot
+re-inflate the type, every field held at 16px under 768px so iOS Safari stops
+zooming on focus, body text unselectable while anything typed stays selectable,
+and the ring colour on focus outlines. Shop photographs use the same img-fade,
+so a picture landing after its card eases in instead of snapping.
+
 ## 2026-08-21 03:40 — hamakali2005 · done
 
 Results are laid out like the hotels site: max-w-7xl page, `grid gap-6

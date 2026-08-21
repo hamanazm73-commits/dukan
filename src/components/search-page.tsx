@@ -391,7 +391,7 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
             src={mediaSrc(shop.photo)}
             alt=""
             loading="lazy"
-            className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="img-fade size-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
           {/* Keeps white lettering legible over a pale sky or a lit sign. */}
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 to-transparent" />
