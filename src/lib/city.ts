@@ -202,6 +202,33 @@ export function useHomeCity(active: boolean): HomeCity {
     }
     let cancelled = false;
     (async () => {
+      /*
+       * The network's answer first, because it costs the visitor nothing.
+       *
+       * Vercel puts the origin of the request on the request itself, so the
+       * city can be guessed with no permission, no prompt, and nothing for
+       * anyone to decide. It is a guess about a connection rather than a
+       * person — on mobile data it can land a city away — which is why the
+       * chip above the results stays a button, and why a wrong answer costs
+       * one tap to fix rather than a refusal the browser remembers forever.
+       */
+      try {
+        const res = await fetch("/api/where", { cache: "no-store" });
+        if (cancelled) return;
+        if (res.ok) {
+          const { city: guess } = (await res.json()) as { city: CityKey | null };
+          if (guess && !cancelled) {
+            setCity(guess);
+            writeStored(guess);
+            setStatus("ready");
+            return;
+          }
+        }
+      } catch {
+        /* offline, or the route is unreachable — fall through and ask */
+      }
+      if (cancelled) return;
+
       try {
         const p = await navigator.permissions?.query({ name: "geolocation" });
         if (cancelled) return;
