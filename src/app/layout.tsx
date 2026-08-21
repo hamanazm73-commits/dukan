@@ -93,6 +93,24 @@ export default function RootLayout({
             __html: JSON.stringify(ORGANIZATION_JSON_LD),
           }}
         />
+        {/* The name Google prints where the address would otherwise go. It is
+            read from the home page of each host, so this site has to declare
+            its own — the parent declaring one does not cover the children. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "@id": `${SITE_URL}/#website`,
+              name: "لای حەمە بیدۆزەوە",
+              alternateName: ["بازاڕی لای حەمە", "Lay Hama", "يم حمة"],
+              url: SITE_URL,
+              inLanguage: "ckb",
+              publisher: { "@id": `${HUB_URL}/#organization` },
+            }),
+          }}
+        />
         {children}
       </body>
     </html>
