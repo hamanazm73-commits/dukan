@@ -25,11 +25,30 @@ import { CATEGORIES } from "@/lib/data";
 
 const KEYS = CATEGORIES.map((c) => c.key);
 
+/*
+ * A word, never null — and never an enum.
+ *
+ * Two things about this schema are not what they look like. The enum this
+ * field used to carry was not a constraint: the SDK keeps only type, anyOf,
+ * items, properties, required and additionalProperties on the way to the API
+ * and folds the rest into `description`, so the sixteen keys arrived as prose
+ * on a free-form string.
+ *
+ * That left `anyOf: [string, null]` — an unconstrained string, or null. Null
+ * is the shorter valid answer and the model took it every time, for a day,
+ * including on the examples the prompt spells out.
+ *
+ * So there is no null branch now. The field is one word, and "none" is a word
+ * like any other. What comes back is checked against the sixteen below.
+ */
+const NONE = "none";
+
 const Interpretation = z.object({
   category: z
-    .enum(KEYS as [string, ...string[]])
-    .nullable()
-    .describe("The trade that sells this, or null if no trade here sells it."),
+    .string()
+    .describe(
+      `Exactly one of: ${KEYS.join(", ")} — or the word ${NONE} if no trade in that list sells the thing.`,
+    ),
   terms: z
     .array(z.string())
     .max(6)
@@ -50,9 +69,9 @@ often naming a thing rather than a trade — "ئایفۆن" means the mobile tra
 Answer with exactly one key from the list above — the trade that would
 actually sell the thing.
 
-Use null only when nothing on that list sells it at all: a plane ticket, a
-bank loan, a hotel room. Being unsure between two trades is not a reason for
-null; pick the likelier one.`;
+Answer "${NONE}" only when nothing on that list sells it at all: a plane
+ticket, a bank loan, a hotel room. Being unsure between two trades is not a
+reason for "${NONE}" — pick the likelier one.`;
 
 /** One instance per warm lambda; the SDK reads ANTHROPIC_API_KEY itself. */
 let client: Anthropic | null = null;
@@ -138,10 +157,10 @@ export async function POST(req: Request) {
        * the reasoning in front of it, not for the output.
        */
       max_tokens: 4096,
-      // Low effort on purpose: this is a one-word classification against a
-      // list of sixteen, and the shopper is waiting with the keyboard open.
+      /* Medium, not low. The shopper is waiting with the keyboard open, but
+         an answer of "none" to everything is not worth having sooner. */
       output_config: {
-        effort: "low",
+        effort: "medium",
         format: zodOutputFormat(Interpretation),
       },
       system: SYSTEM,
@@ -177,8 +196,8 @@ export async function POST(req: Request) {
      * the sixteen becomes null rather than a category key the rest of the
      * site would search for and never find.
      */
-    const category =
-      parsed.category && KEYS.includes(parsed.category) ? parsed.category : null;
+    const raw = parsed.category?.trim().toLowerCase() ?? "";
+    const category = KEYS.includes(raw) ? raw : null;
 
     if (!category) {
       console.error(
