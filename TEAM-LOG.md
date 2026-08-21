@@ -10,6 +10,20 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 06:05 — hamakali2005 · done
+
+**Vocabulary 433 → 759 terms.** Things, in the words people reach for: شاحن,
+airpods, redmi, برجر, شاورما, بەقلاوە, بەتری, زەیت, پەمپەرز, حليب اطفال,
+سجاد, كنب, بخور, صبغة شعر — brands, goods and the Arabic and Latin spellings
+beside the Kurdish, across all sixteen trades. The thin ones gained most:
+barber went 19 → 42, supermarket 23 → 54.
+
+Every word added here is one Claude no longer has to be paid to interpret, and
+one answered instantly and offline instead of after a round trip. `data.ts`
+still says it best: this list is the product.
+
+Checked: شاحن and airpods now land on مۆبایل locally, no /api/interpret call.
+
 ## 2026-08-21 05:55 — Mohammed · done
 
 Answering the list below, and adding what changed while Hama was away.
