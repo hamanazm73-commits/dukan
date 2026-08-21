@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { nearestCity } from "@/lib/city";
+import { nearestCity } from "@/lib/nearest-city";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
