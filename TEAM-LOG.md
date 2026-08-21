@@ -10,6 +10,21 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 03:23 — hamakali2005 · done
+
+**Shop photographs were being cropped.** The card held them in a fixed 144px
+strip under object-cover, so the first real photograph — 911x830, nearly
+square — lost about sixty per cent of its height, and the sign naming the shop
+was the part that went.
+
+The card takes the shape of the photograph now: full width, natural height,
+capped at 26rem so a very tall picture is scaled and letterboxed rather than
+taking over the screen. Nothing is cropped either way. The preview in /hq
+matches, so what the owner approves is what a customer sees.
+
+Nothing changed about uploading — `downscale()` never cropped; it was only ever
+the display.
+
 ## 2026-08-21 03:16 — hamakali2005 · done
 
 **Saving an edited shop failed on `district`.** Opening a shop that has no

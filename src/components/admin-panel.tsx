@@ -735,7 +735,13 @@ function PhotoField({
       {value ? (
         <div className="relative overflow-hidden rounded-xl border border-border">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={mediaSrc(value)} alt="" className="h-36 w-full object-cover" />
+          {/* Shown whole, and at the same proportions the card will use, so
+              what the owner approves here is what a customer gets. */}
+          <img
+            src={mediaSrc(value)}
+            alt=""
+            className="block max-h-[26rem] w-full bg-muted object-contain"
+          />
           <button
             type="button"
             onClick={() => onChange(undefined)}

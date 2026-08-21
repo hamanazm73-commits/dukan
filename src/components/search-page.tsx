@@ -376,16 +376,25 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
     >
       {/* The photograph, when there is one. Most shops will not have one for
           a long time, so the card below has to stand on its own — this is an
-          addition to it rather than the thing it is built around. */}
+          addition to it rather than the thing it is built around.
+
+          The card takes the shape of the photograph rather than the other way
+          round. A fixed strip and object-cover cropped every picture to one
+          ratio, and what a shop chooses to photograph — a sign, a frontage, a
+          room — is rarely the shape of a strip; the sign that names the place
+          was the first thing cut off.
+
+          max-h is the one guard: a very tall picture is scaled down and
+          letterboxed against the muted panel instead of taking over the whole
+          screen. Nothing is cropped in either case. */}
       {shop.photo && (
-        <div className="relative h-36 bg-muted sm:h-44">
+        <div className="relative bg-muted">
           <img
             src={mediaSrc(shop.photo)}
             alt=""
             loading="lazy"
-            className="size-full object-cover"
+            className="block max-h-[26rem] w-full object-contain"
           />
-          <span className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-card to-transparent" />
         </div>
       )}
 
