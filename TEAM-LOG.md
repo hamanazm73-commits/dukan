@@ -10,6 +10,26 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 04:41 — hamakali2005 · open, for whoever picks this up
+
+Hama has run out of Claude hours; Mohammed is taking the dashboard work.
+Nothing here needs code — all four are things only an account holder can do.
+
+**Vercel → dukan → Environment Variables**
+- `NEXT_PUBLIC_SITE_URL` = `https://bedozawa.layhama.com`
+- `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY` — the same pair the hotels
+  site uses; both sites share the `hotel-media` bucket, split by key prefix.
+  **Without them the live site opens fine and silently cannot upload a photo**
+  — /api/upload answers 501 and /api/img cannot serve one either.
+- `ANTHROPIC_API_KEY` — only for /api/interpret. Absent, the route returns
+  null and the search behaves exactly as it did before it existed.
+
+**The directory is empty.** One shop, in Kirkuk. A search site with nothing in
+it finds nothing, and that is now the largest thing standing between this and
+being useful — larger than anything left in the code.
+
+The domain itself is done: bedozawa.layhama.com answers 200.
+
 ## 2026-08-21 04:27 — hamakali2005 · done
 
 **The search asks Claude when the word list runs out.** New `/api/interpret`:
