@@ -10,6 +10,12 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 04:08 — hamakali2005 · done
+
+The third door is **bedozawa.layhama.com**, not shops. — the address now says
+what the site is called. Changed on both sides: the hub entry, the OG card and
+the organisation data here, the default SITE_URL and .env.local there.
+
 ## 2026-08-21 04:00 — hamakali2005 · done
 
 Prepared for **shops.layhama.com**: metadataBase, a canonical, OpenGraph, a

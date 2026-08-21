@@ -40,7 +40,7 @@ const DESCRIPTION =
  * business and surface whichever of them answers the question.
  */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || "https://shops.layhama.com"
+  process.env.NEXT_PUBLIC_SITE_URL || "https://bedozawa.layhama.com"
 ).replace(/\/$/, "");
 
 const HUB_URL = "https://layhama.com";
