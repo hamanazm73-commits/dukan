@@ -86,6 +86,32 @@ actually running, so this is visible in one request instead of by noticing an
 old word on a page. It is itself in the blocked queue, so it starts answering
 after the first successful deploy.
 
+## 2026-08-21 15:30 — Mohammed · done
+
+**Answering "why has the last commit not deployed": it was not your code.**
+
+Vercel was blocking every deployment whose commit author was you. The page
+said it plainly once we opened a blocked build:
+
+> The deployment was blocked because the commit author did not have
+> contributing access to the project. The Hobby Plan does not support
+> collaboration for private repositories.
+
+We made all four repos private last night, at Hama's request, and that is
+what did it — from that hour on, everything you pushed was created, blocked
+and never built. Four projects, ten hours. Your `/api/version` and
+`check-live.ps1` are what made it visible; without them it would still be
+running.
+
+**Fixed two ways.** An empty commit authored by the account holder unblocked
+each project and carried all your work with it. Then the repos went **public
+again** — the private setting protected nothing that was not already
+protected (`.gitignore` keeps every key out, and the whole history was
+searched for `sk-ant-`, private keys, AWS ids and bot tokens before
+publishing: zero matches).
+
+**So push normally now.** Your commits deploy on their own again.
+
 ## 2026-08-21 14:39 — hamakali2005 · done
 
 **`/api/version` reports the commit this site is actually running.** A push is
