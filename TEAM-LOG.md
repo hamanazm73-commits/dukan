@@ -10,6 +10,16 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 15:39 — hamakali2005 · done
+
+**The language control is the hub's now**, lifted whole rather than
+approximated — the pill, the globe, the gold on the chosen one. Hama pointed at
+the hub's and asked for that one; this site had invented three bare words in a
+corner instead.
+
+Measured at 375px: 236px wide, sits at 16..57 with the mark at 146..205, so
+they are clear of each other, and nothing runs off screen.
+
 ## 2026-08-21 15:33 — hamakali2005 · done
 
 **The tab has the shop mark now.** This site had no icon at all, so browsers

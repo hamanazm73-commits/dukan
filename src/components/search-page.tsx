@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import {
   Clock,
+  Globe,
   Map as MapIcon,
   MapPin,
   Phone,
@@ -243,28 +244,28 @@ export function SearchPage() {
       {/* The page is as wide as the hotels site so the results can sit three
           abreast, but the mark and the field stay in a 2xl column down the
           middle. A search box stretched across a desktop is a worse box. */}
-      {/* Three words in the corner, not a dropdown.
-          There are only three and each is written in its own script, so the
-          choice reads itself — a select would hide two of them behind a tap
-          and give an empty page a control to operate before anything has
-          been asked. */}
-      <div className="absolute end-4 top-4 z-30 flex items-center gap-1 sm:end-6">
-        {LOCALES.map((l) => (
-          <button
-            key={l.code}
-            type="button"
-            onClick={() => setLocale(l.code)}
-            aria-current={l.code === locale}
-            title={t("language")}
-            className={`rounded-full px-2.5 py-1 text-xs transition-colors ${
-              l.code === locale
-                ? "bg-gold/15 font-bold text-gold"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            }`}
-          >
-            {l.label}
-          </button>
-        ))}
+      {/* The hub's language control, lifted whole rather than approximated —
+          same pill, same globe, same gold on the chosen one. Four sites that
+          each invent their own version of this stop reading as one family. */}
+      <div className="absolute end-4 top-4 z-30 sm:end-6">
+        <div className="inline-flex items-center gap-1 rounded-full border border-white/12 bg-black/25 p-1 backdrop-blur-md">
+          <Globe className="mx-2 size-4 shrink-0 text-white/40" aria-hidden />
+          {LOCALES.map((l) => (
+            <button
+              key={l.code}
+              type="button"
+              onClick={() => setLocale(l.code)}
+              aria-current={l.code === locale}
+              className={`rounded-full px-3 py-1.5 text-[0.8rem] font-semibold transition-colors sm:px-3.5 sm:text-sm ${
+                locale === l.code
+                  ? "bg-gold text-[#0f1624]"
+                  : "text-white/60 hover:text-white"
+              }`}
+            >
+              {l.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div
