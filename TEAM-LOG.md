@@ -10,6 +10,33 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 04:27 — hamakali2005 · done
+
+**The search asks Claude when the word list runs out.** New `/api/interpret`:
+given a query nothing local matched, it returns one of the sixteen category
+keys or null. The client then re-runs its **own** search on that trade, so the
+shops still come from the local index — the model never sees the database and
+cannot put a shop on the page that was not already in it. Asked only after a
+local miss, cached per tab, rate-limited per instance, and silent when
+`ANTHROPIC_API_KEY` is absent: the site behaves exactly as before without it.
+The result is labelled on screen, because a guess shown as a match is a lie.
+
+**Also fixed two things in `/api/where`, from the commit that landed while I
+was working:**
+
+1. It 500'd on every request. `nearestCity` lived in `city.ts`, which is
+   `"use client"`, so the server route compiled and then threw. The other side
+   was fixing this in the same hour — `nearest-city.ts` is theirs; mine was a
+   second file with the same contents and was dropped in the merge. Third time
+   this week two of us have built the same thing at once.
+2. With the headers absent it answered **Zakho** for everyone. `Number(null)`
+   and `Number("")` are both 0, and 0 is finite, so a missing header became a
+   valid point at (0,0) — nearest Kurdish city, Zakho. Now checked as text
+   before conversion.
+
+Verified: no headers → null, Kirkuk coords → kirkuk, Erbil → erbil, Berlin →
+outside, blank header → null.
+
 ## 2026-08-21 04:08 — hamakali2005 · done
 
 The third door is **bedozawa.layhama.com**, not shops. — the address now says

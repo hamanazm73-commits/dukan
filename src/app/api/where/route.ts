@@ -20,8 +20,6 @@ export const dynamic = "force-dynamic";
  */
 export function GET(request: Request): NextResponse {
   const h = request.headers;
-  const lat = Number(h.get("x-vercel-ip-latitude"));
-  const lng = Number(h.get("x-vercel-ip-longitude"));
 
   // Outside Iraq the nearest of twelve Kurdish cities is meaningless — the
   // answer would be "Zakho" for someone in Berlin. Better to say nothing.
@@ -30,8 +28,24 @@ export function GET(request: Request): NextResponse {
     return NextResponse.json({ city: null, reason: "outside" });
   }
 
+  /*
+   * Read as text and reject an absent or blank header before converting.
+   *
+   * Number(null) is 0, Number("") is 0, and 0 is finite — so a missing header
+   * arrived as a perfectly valid point at (0, 0) in the Gulf of Guinea, whose
+   * nearest Kurdish city is Zakho. Every request not served by Vercel, this
+   * whole site in local development included, was answered "Zakho" with
+   * confidence.
+   */
+  const latRaw = h.get("x-vercel-ip-latitude")?.trim();
+  const lngRaw = h.get("x-vercel-ip-longitude")?.trim();
+  if (!latRaw || !lngRaw) {
+    return NextResponse.json({ city: null, reason: "unknown" });
+  }
+
+  const lat = Number(latRaw);
+  const lng = Number(lngRaw);
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-    // Running locally, or the header is absent.
     return NextResponse.json({ city: null, reason: "unknown" });
   }
 

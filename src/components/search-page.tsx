@@ -1,7 +1,16 @@
 "use client";
 
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
-import { Clock, Map, MapPin, Phone, Search, X, type LucideIcon } from "lucide-react";
+import {
+  Clock,
+  Map as MapIcon,
+  MapPin,
+  Phone,
+  Search,
+  Sparkles,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 import * as Icons from "lucide-react";
 import { CATEGORIES, CITY_NAMES, SHOPS, type Shop } from "@/lib/data";
 import { CITY_KEYS, useHomeCity } from "@/lib/city";
@@ -51,6 +60,16 @@ const HINTS = [
  * mean the same thing do not.
  */
 const OPENING = "بینووسە، بیدۆزەرەوە";
+
+/**
+ * What the interpreter has already been asked, for this tab's lifetime.
+ *
+ * A query that meant nothing to the word list will mean nothing to it on the
+ * next keystroke either, and the same shopper backspacing and retyping would
+ * otherwise pay for the same answer several times over. `null` is a cached
+ * answer too — "no trade here sells that" is worth remembering.
+ */
+const AI_CACHE = new Map<string, string | null>();
 
 export function SearchPage() {
   const [query, setQuery] = useState("");
@@ -124,10 +143,88 @@ export function SearchPage() {
     [deferred, searcher, home.city],
   );
 
+  /*
+   * When the word list runs out.
+   *
+   * data.ts answers instantly, offline and for free, and it gets nearly
+   * everything. What it cannot get is a word nobody listed — a brand, a
+   * sentence, a way of naming a thing that was not anticipated. Only then is
+   * /api/interpret asked, and only for which trade; the shops still come out
+   * of the same local index, so nothing reaches the page that was not in it.
+   */
+  const emptyLocally =
+    !!result && result.shops.length === 0 && result.elsewhere.length === 0;
+  const [aiKey, setAiKey] = useState<string | null>(null);
+  /** the query aiKey was found for, so a stale answer is never shown */
+  const [aiFor, setAiFor] = useState("");
+  const [aiBusy, setAiBusy] = useState(false);
+
+  useEffect(() => {
+    const q = deferred.trim();
+    if (!emptyLocally || !q || aiFor === q) return;
+
+    const cached = AI_CACHE.get(q);
+    if (cached !== undefined) {
+      setAiFor(q);
+      setAiKey(cached);
+      return;
+    }
+
+    let cancelled = false;
+    setAiBusy(true);
+    void fetch("/api/interpret", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ q }),
+    })
+      .then((r) => (r.ok ? r.json() : { category: null }))
+      .then((d: { category?: string | null }) => {
+        const key = d.category ?? null;
+        AI_CACHE.set(q, key);
+        if (cancelled) return;
+        setAiFor(q);
+        setAiKey(key);
+      })
+      .catch(() => {
+        // Asked and got nothing reads the same as found nothing.
+        AI_CACHE.set(q, null);
+        if (cancelled) return;
+        setAiFor(q);
+        setAiKey(null);
+      })
+      .finally(() => {
+        if (!cancelled) setAiBusy(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [emptyLocally, deferred, aiFor]);
+
+  const aiCategory =
+    aiKey && aiFor === deferred.trim()
+      ? CATEGORIES.find((c) => c.key === aiKey)
+      : undefined;
+
+  /* The trade's own name, put back through the same search everything else
+     goes through — so the city rules and the ordering are the ones already
+     written, not a second set living next to them. */
+  const aiResult = useMemo(
+    () =>
+      aiCategory ? searcher(aiCategory.label.ku, home.city ?? undefined) : null,
+    [aiCategory, searcher, home.city],
+  );
+
+  const hasHits = (r: typeof result) =>
+    !!r && (r.shops.length > 0 || r.elsewhere.length > 0);
+
+  const shown = hasHits(result) ? result : hasHits(aiResult) ? aiResult : result;
+  const viaAi = shown !== null && shown === aiResult;
+
   /* Near shops are the answer; far ones stand in only when there are none.
      One list is rendered either way — what changes is the sentence above it. */
-  const fallback = !!result && result.shops.length === 0 && result.elsewhere.length > 0;
-  const list = result ? (fallback ? result.elsewhere : result.shops) : [];
+  const fallback = !!shown && shown.shops.length === 0 && shown.elsewhere.length > 0;
+  const list = shown ? (fallback ? shown.elsewhere : shown.shops) : [];
 
   return (
     /*
@@ -243,7 +340,7 @@ export function SearchPage() {
         </div>
       </div>
 
-      {result && (
+      {shown && (
         <div className="mt-5">
           {/* Which city these answers came from, and the way to change it.
               Only ever after a search: on the empty page it would be one more
@@ -329,27 +426,44 @@ export function SearchPage() {
               <>
                 <span className="font-bold text-foreground">{list.length}</span>{" "}
                 دووکان
-                {result.category && (
+                {shown.category && (
                   <>
                     {" "}
-                    لە <span className="text-gold">{result.category.label.ku}</span>
+                    لە <span className="text-gold">{shown.category.label.ku}</span>
                   </>
                 )}
                 {/* A city named in the query is worth repeating back. The one
                     we chose for them is already on the button above. */}
-                {result.city && <> لە {CITY_NAMES[result.city].ku}</>}
+                {shown.city && <> لە {CITY_NAMES[shown.city].ku}</>}
               </>
             ) : (
               "هیچ نەدۆزرایەوە"
             )}
           </p>
 
+          {/* Said out loud, because a guess presented as a match is a lie.
+              The shopper wrote something the word list did not carry; this
+              says what it was taken to mean, so a wrong reading is obvious
+              rather than mysterious. */}
+          {viaAi && aiCategory && (
+            <div className="mb-3 flex items-start gap-2 rounded-2xl border border-gold/25 bg-gold/[0.06] p-3">
+              <Sparkles className="mt-0.5 size-4 shrink-0 text-gold" aria-hidden />
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                ئەم وشەیە لە لیستەکەماندا نەبوو. وامان لێکدایەوە کە مەبەستت{" "}
+                <span className="font-bold text-gold">
+                  {aiCategory.label.ku}
+                </span>{" "}
+                بووە.
+              </p>
+            </div>
+          )}
+
           {/* Said before the far-away list, not inside it: the point is that
               these are not near, and a card cannot carry that. */}
-          {fallback && result.homeCity && (
+          {fallback && shown.homeCity && (
             <div className="mb-3 rounded-2xl border border-dashed border-border p-4 text-center">
               <p className="text-sm leading-relaxed text-muted-foreground">
-                لە <span className="text-foreground">{CITY_NAMES[result.homeCity].ku}</span>{" "}
+                لە <span className="text-foreground">{CITY_NAMES[shown.homeCity].ku}</span>{" "}
                 نەدۆزرایەوە.
                 <br />
                 بەڵام لە شارەکانی تر هەیە:
@@ -359,11 +473,20 @@ export function SearchPage() {
 
           {list.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border p-8 text-center">
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                هیچ دووکانێک بەم ناوە نەدۆزرایەوە.
-                <br />
-                بە شێوەیەکی تر بینووسە، یان ناوی شارەکەشی لەگەڵ بنووسە.
-              </p>
+              {/* While the interpreter is being asked, the empty state would
+                  otherwise flash "nothing found" and then contradict itself. */}
+              {aiBusy ? (
+                <p className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+                  <Sparkles className="size-4 animate-pulse text-gold" aria-hidden />
+                  لێی تێدەگەین…
+                </p>
+              ) : (
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  هیچ دووکانێک بەم ناوە نەدۆزرایەوە.
+                  <br />
+                  بە شێوەیەکی تر بینووسە، یان ناوی شارەکەشی لەگەڵ بنووسە.
+                </p>
+              )}
             </div>
           ) : (
             <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -514,7 +637,7 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
               rel="noopener noreferrer"
               className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border px-4 text-sm font-bold transition-colors hover:bg-muted"
             >
-              <Map className="size-4" aria-hidden />
+              <MapIcon className="size-4" aria-hidden />
               ڕێگا
             </a>
           )}
