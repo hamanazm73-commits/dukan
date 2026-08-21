@@ -10,6 +10,82 @@ Newest entry at the top.
 
 ---
 
+## OPEN — Mohammed: Vercel is blocking everything Hama pushes
+
+Vercel's own words, on the dukan deployment of `0b92381`:
+
+> **Deployment Blocked** — The deployment was blocked because the commit author
+> did not have contributing access to the project on Vercel. The Hobby Plan does
+> not support collaboration for private repositories.
+
+The Vercel account is **mohammed**, on **Hobby**. The repos are **private**,
+under `hamanazm73-commits`. Commits authored by **hamakali2005-ops** — every
+commit from Hama's side — are refused a build. Yours build normally.
+
+### What this is not
+
+Worth saying plainly, because time went into ruling each of these out:
+
+- **Not the code.** All four repos build clean locally.
+- **Not a failed build.** The builds never start.
+- **Not billing.** There was a separate "billing address incomplete" warning
+  earlier; it is gone and the block stayed. Different thing.
+- **Not env vars, not the branch setting, not DNS.**
+- **Not `3-dukan.txt`.** Hama's `.env.local` has had all eight NEXT_PUBLIC_
+  values since the first day; `/shops/…` answers 200 on his machine.
+
+### Why some of his work IS live and some is not
+
+A blocked commit is not lost — it is still on the branch. The next time **you**
+push, Vercel builds **your** commit, and everything sitting behind it on the
+branch ships with it.
+
+That is the whole pattern: his work reaches the site whenever you happen to
+push after him, and stops dead whenever you do not. The third card on
+layhama.com is his and it is live, because you pushed at 04:31. Nothing after
+that has moved.
+
+### Waiting on the branch right now
+
+- `0b92381` Let each site say which commit it is running
+- `a6abfda` Say the rest of it in Arabic and English too
+- `4b8bb60` Name the shops site the same thing in all three languages
+- `a209612` Take the row of sister-site links back off
+- `e5bdeca` Teach the list 326 more ways to ask
+- `fdc054e` Write down what is left, for whoever has hours
+- `9a7af0b` Ask Claude only when the word list has nothing
+- `86a7e4d` Move the third door to bedozawa.layhama.com
+- `282e5ab` Say where this site lives, and whose it is
+- `dfeed82` Name the site لای حەمە بیدۆزەوە, and leave one cross in the field
+- `78bf69f` Set the type the way the hotels site sets it
+- `22398c1` Lay the results out the way the hotels site does
+- `da02a71` Build the shop card to the hotel card
+- `13e3188` Hold every photograph to one ratio
+
+### Four ways out — your call, it is your account
+
+1. **Make the repos public.** Free, and Hobby only refuses collaboration on
+   *private* repos. Nothing secret is in them — `.env.local` is gitignored and
+   verified untracked in all four. The cost is that the code is readable by
+   anyone.
+2. **Upgrade to Pro.** About $20 a month. The correct fit for two people
+   working on one thing, and the repos stay private.
+3. **Have Hama's commits authored as you.** Free and immediate, but the history
+   would say you wrote all of it — and TEAM-LOG only works because it says who
+   did what.
+4. **Deploy from the command line** with a token, which skips the author check.
+   Free, but it becomes a manual step after every change.
+
+Hama was asked and did not want to pick one on your behalf. Say which, and it
+gets set up from his side in a few minutes.
+
+### Until then
+
+`/api/version` is on all four sites now — it reports the commit each one is
+actually running, so this is visible in one request instead of by noticing an
+old word on a page. It is itself in the blocked queue, so it starts answering
+after the first successful deploy.
+
 ## 2026-08-21 14:39 — hamakali2005 · done
 
 **`/api/version` reports the commit this site is actually running.** A push is
