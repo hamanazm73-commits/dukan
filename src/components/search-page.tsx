@@ -275,43 +275,11 @@ export function SearchPage() {
             ever reached through the button on the right, and "not now"
             never touches it at all.
           */}
-          {home.status === "asking" && (
-            <div className="pop-in mb-3 overflow-hidden rounded-2xl border border-gold/30 bg-card">
-              <div className="flex gap-3 p-4">
-                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-gold/15">
-                  <MapPin className="size-5 text-gold" aria-hidden />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-sm font-bold">
-                    نزیکترین دووکانت پیشان بدەین؟
-                  </p>
-                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                    ئەگەر شارەکەت بزانین، ئەو دووکانانەت پیشان دەدەین کە لە
-                    شارەکەی خۆتدان — نەک شارێکی دوور. تەنها ناوی شارەکە
-                    بەکاردێت، و لە وێبگەڕەکەی خۆتدا دەمێنێتەوە.
-                  </p>
-                </div>
-              </div>
-              {/* Stacked under 380px: two labelled buttons side by side leave
-                  about 150px each on a phone, and the words wrap mid-word. */}
-              <div className="grid gap-2 border-t border-border p-3 sm:grid-cols-2">
-                <button
-                  type="button"
-                  onClick={home.decline}
-                  className="h-10 rounded-xl border border-border text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted"
-                >
-                  ئێستا نا
-                </button>
-                <button
-                  type="button"
-                  onClick={home.locate}
-                  className="h-10 rounded-xl bg-gold text-sm font-bold text-gold-foreground transition-opacity hover:opacity-90"
-                >
-                  بەڵێ، شارەکەم بدۆزەوە
-                </button>
-              </div>
-            </div>
-          )}
+          <CityAsk
+            open={home.status === "asking"}
+            onAllow={home.locate}
+            onDecline={home.decline}
+          />
 
           {pickerOpen && (
             <div className="mb-3 rounded-2xl border border-border bg-card p-3">
@@ -553,5 +521,101 @@ function ShopCard({ shop, index }: { shop: Shop; index: number }) {
         </div>
       </div>
     </li>
+  );
+}
+
+/**
+ * The one question the site asks before the browser does.
+ *
+ * It comes forward rather than sitting in the page. Inline, it was a strip
+ * competing with the results for attention and stretching to whatever width
+ * the screen happened to be — 343px on a phone, 1280px on a desktop, the
+ * same short sentence in both. A dialog is the same size wherever it opens,
+ * and it is unmistakably a question rather than another row of the list.
+ *
+ * Every way out lands on "not now": the backdrop, Escape, the button. Only
+ * the gold button reaches the browser, so a person who dismisses this has
+ * not spent their one permission — the browser will still ask another day.
+ */
+function CityAsk({
+  open,
+  onAllow,
+  onDecline,
+}: {
+  open: boolean;
+  onAllow: () => void;
+  onDecline: () => void;
+}) {
+  const allowRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    // Focus the answer rather than the dismissal: someone on a keyboard
+    // should land on the thing the dialog is for.
+    allowRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onDecline();
+    };
+    // The page behind must not scroll away under the dialog.
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open, onDecline]);
+
+  if (!open) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 grid place-items-center bg-black/65 p-4 backdrop-blur-sm"
+      onClick={onDecline}
+      role="presentation"
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="city-ask-title"
+        // Stops a click inside the card from reaching the backdrop above.
+        onClick={(e) => e.stopPropagation()}
+        className="pop-in w-full max-w-sm overflow-hidden rounded-2xl border border-gold/25 bg-card shadow-2xl shadow-black/50"
+      >
+        <div className="px-6 pb-5 pt-7 text-center">
+          <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-gold/15">
+            <MapPin className="size-7 text-gold" aria-hidden />
+          </span>
+          <h2 id="city-ask-title" className="mt-4 text-lg font-bold">
+            نزیکترین دووکانت پیشان بدەین؟
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            ئەگەر شارەکەت بزانین، ئەو دووکانانەت پیشان دەدەین کە لە شارەکەی
+            خۆتدان — نەک شارێکی دوور.
+          </p>
+          <p className="mt-3 text-xs leading-relaxed text-muted-foreground/80">
+            تەنها ناوی شارەکە بەکاردێت. لە وێبگەڕەکەی خۆتدا دەمێنێتەوە و بۆ
+            هیچ شوێنێک نانێردرێت.
+          </p>
+        </div>
+        <div className="grid gap-2 border-t border-border p-4">
+          <button
+            ref={allowRef}
+            type="button"
+            onClick={onAllow}
+            className="h-12 rounded-xl bg-gold text-sm font-bold text-gold-foreground transition-opacity hover:opacity-90"
+          >
+            بەڵێ، شارەکەم بدۆزەوە
+          </button>
+          <button
+            type="button"
+            onClick={onDecline}
+            className="h-11 rounded-xl text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted"
+          >
+            ئێستا نا
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
