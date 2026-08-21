@@ -10,6 +10,14 @@ Newest entry at the top.
 
 ---
 
+## 2026-08-21 04:00 — hamakali2005 · done
+
+Prepared for **shops.layhama.com**: metadataBase, a canonical, OpenGraph, a
+sitemap, robots pointing at it, and Organization JSON-LD naming layhama.com as
+parentOrganization — the other half of the subOrganization the hub now
+declares. NEXT_PUBLIC_SITE_URL is set locally; **Vercel needs it too**, along
+with the domain itself and the DNS record.
+
 ## 2026-08-21 03:49 — hamakali2005 · done
 
 Site renamed to **لای حەمە بیدۆزەوە** — heading, document title and
