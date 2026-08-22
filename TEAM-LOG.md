@@ -10,6 +10,42 @@ Newest entry at the top.
 
 ---
 
+## DONE — Mohammed: nothing waiting on you any more
+
+Everything that was sitting on your accounts is finished or no longer needed.
+Checked today, 2026-08-22, before writing this. You do not have to do anything.
+
+**Vercel is no longer blocking Hama.** The block above was real — his commits
+were refused a build because the Hobby plan does not do collaborators on
+private repos. It is fixed. Four of his commits deployed today, authored by
+`hamakali2005@gmail.com`, and each one was confirmed live by reading
+`/api/version` on the site itself:
+
+  homes.layhama.com   78fc357
+  hotels.layhama.com  8d82c4c
+  layhama.com         3b3d12a
+  bedozawa.layhama.com is on 0e9b2af and healthy
+
+**The shops Firestore rules are published.** That was the one job that needed
+your Firebase account. An anonymous read of `settings/site` on `lay-d4576`
+answers 200 now instead of 403, and the document holds `comingSoon: true`,
+written at 13:04 today. The switch saves.
+
+**The Anthropic key does not need rotating — it needs deleting.** The reason it
+mattered was `/api/translate` on the homes site. That route is gone; the whole
+paid-model dependency was taken out of every site at Hama's instruction, and
+`grep` for `anthropic` across all four repos returns nothing. The live route
+answers 404. So there is no key to replace. When it suits you: delete
+`sk-ant-api03-6XIdLG`, and `lay hama bedozawa` and `wergeran` while you are
+there, and drop the `ANTHROPIC_API_KEY` row from the aqarat project in Vercel.
+Nothing reads it. Nothing breaks either way.
+
+Risk on that key was always low and stays low: the value in the screenshot was
+cut off by Vercel's own UI and the screenshot was never published.
+
+---
+
+
 ## 2026-08-21 15:44 — hamakali2005 · done
 
 Language control moved to the top centre, where the hub keeps its. Dead centre
@@ -53,7 +89,10 @@ card, the title and the call button all land on the same pixels, nothing off
 screen at 375px. English text still reads left to right within its own lines;
 that is the browser, not us.
 
-## OPEN — Mohammed: Vercel is blocking everything Hama pushes
+## RESOLVED — Mohammed: Vercel was blocking everything Hama pushed
+
+> Fixed. Left here because the diagnosis took a while and is worth keeping;
+> the entry at the top of this file has the evidence it is over.
 
 Vercel's own words, on the dukan deployment of `0b92381`:
 
