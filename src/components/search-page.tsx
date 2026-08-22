@@ -64,15 +64,6 @@ function iconFor(name: string): LucideIcon {
  * lists say the same things in the same spirit, not word for word.
  */
 
-/**
- * What the interpreter has already been asked, for this tab's lifetime.
- *
- * A query that meant nothing to the word list will mean nothing to it on the
- * next keystroke either, and the same shopper backspacing and retyping would
- * otherwise pay for the same answer several times over. `null` is a cached
- * answer too — "no trade here sells that" is worth remembering.
- */
-const AI_CACHE = new Map<string, string | null>();
 
 export function SearchPage() {
   const { locale, setLocale, t } = useLocale();
@@ -159,84 +150,25 @@ export function SearchPage() {
   );
 
   /*
-   * When the word list runs out.
+   * The word list is the whole search now.
    *
-   * data.ts answers instantly, offline and for free, and it gets nearly
-   * everything. What it cannot get is a word nobody listed — a brand, a
-   * sentence, a way of naming a thing that was not anticipated. Only then is
-   * /api/interpret asked, and only for which trade; the shops still come out
-   * of the same local index, so nothing reaches the page that was not in it.
+   * There used to be a second stage: when data.ts matched nothing, the query
+   * went to a model to be read for which trade it meant. It worked, and it was
+   * billed per query — a stranger typing something unusual spent the office's
+   * money, and neither of them knew it. That is the wrong shape for a
+   * directory, so it is gone.
+   *
+   * What made the search feel clever was never the model. It is the 1299 words
+   * in data.ts — the brands, the goods, the Arabic and Latin spellings beside
+   * the Kurdish — and those answer instantly, offline, for nothing, and they
+   * stay. A word nobody listed now returns nothing, which is honest, and the
+   * fix for it is to add the word.
    */
-  const emptyLocally =
-    !!result && result.shops.length === 0 && result.elsewhere.length === 0;
-  const [aiKey, setAiKey] = useState<string | null>(null);
-  /** the query aiKey was found for, so a stale answer is never shown */
-  const [aiFor, setAiFor] = useState("");
-  const [aiBusy, setAiBusy] = useState(false);
-
-  useEffect(() => {
-    const q = deferred.trim();
-    if (!emptyLocally || !q || aiFor === q) return;
-
-    const cached = AI_CACHE.get(q);
-    if (cached !== undefined) {
-      setAiFor(q);
-      setAiKey(cached);
-      return;
-    }
-
-    let cancelled = false;
-    setAiBusy(true);
-    void fetch("/api/interpret", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ q }),
-    })
-      .then((r) => (r.ok ? r.json() : { category: null }))
-      .then((d: { category?: string | null }) => {
-        const key = d.category ?? null;
-        AI_CACHE.set(q, key);
-        if (cancelled) return;
-        setAiFor(q);
-        setAiKey(key);
-      })
-      .catch(() => {
-        // Asked and got nothing reads the same as found nothing.
-        AI_CACHE.set(q, null);
-        if (cancelled) return;
-        setAiFor(q);
-        setAiKey(null);
-      })
-      .finally(() => {
-        if (!cancelled) setAiBusy(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [emptyLocally, deferred, aiFor]);
-
-  const aiCategory =
-    aiKey && aiFor === deferred.trim()
-      ? CATEGORIES.find((c) => c.key === aiKey)
-      : undefined;
-
-  /* The trade's own name, put back through the same search everything else
-     goes through — so the city rules and the ordering are the ones already
-     written, not a second set living next to them. */
-  const aiResult = useMemo(
-    () =>
-      aiCategory
-        ? searcher(aiCategory.label[locale], home.city ?? undefined)
-        : null,
-    [aiCategory, searcher, home.city, locale],
-  );
 
   const hasHits = (r: typeof result) =>
     !!r && (r.shops.length > 0 || r.elsewhere.length > 0);
 
-  const shown = hasHits(result) ? result : hasHits(aiResult) ? aiResult : result;
-  const viaAi = shown !== null && shown === aiResult;
+  const shown = result;
 
   /* Near shops are the answer; far ones stand in only when there are none.
      One list is rendered either way — what changes is the sentence above it. */
@@ -553,19 +485,6 @@ export function SearchPage() {
             )}
           </p>
 
-          {/* Said out loud, because a guess presented as a match is a lie.
-              The shopper wrote something the word list did not carry; this
-              says what it was taken to mean, so a wrong reading is obvious
-              rather than mysterious. */}
-          {viaAi && aiCategory && (
-            <div className="mb-3 flex items-start gap-2 rounded-2xl border border-gold/25 bg-gold/[0.06] p-3">
-              <Sparkles className="mt-0.5 size-4 shrink-0 text-gold" aria-hidden />
-              <p className="text-xs leading-relaxed text-muted-foreground">
-                {t("aiRead", { cat: aiCategory.label[locale] })}
-              </p>
-            </div>
-          )}
-
           {/* Said before the far-away list, not inside it: the point is that
               these are not near, and a card cannot carry that. */}
           {fallback && shown.homeCity && (
@@ -580,20 +499,13 @@ export function SearchPage() {
 
           {list.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border p-8 text-center">
-              {/* While the interpreter is being asked, the empty state would
-                  otherwise flash "nothing found" and then contradict itself. */}
-              {aiBusy ? (
-                <p className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-                  <Sparkles className="size-4 animate-pulse text-gold" aria-hidden />
-                  {t("aiThinking")}
-                </p>
-              ) : (
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {t("nothingLong")}
-                  <br />
-                  {t("nothingHint")}
-                </p>
-              )}
+              {/* Nothing to wait for any more: the word list has already
+                  answered by the time this renders. */}
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t("nothingLong")}
+                <br />
+                {t("nothingHint")}
+              </p>
             </div>
           ) : (
             <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

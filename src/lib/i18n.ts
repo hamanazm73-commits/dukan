@@ -97,9 +97,7 @@ type Dict = {
   nothingLong: string;
   nothingHint: string;
 
-  aiThinking: string;
   /** "{word} was not in our list — we read it as {category}" */
-  aiRead: string;
   notHere: string;
   butElsewhere: string;
 
@@ -156,8 +154,6 @@ const ku: Dict = {
   nothingLong: "هیچ دووکانێک بەم ناوە نەدۆزرایەوە.",
   nothingHint: "بە شێوەیەکی تر بینووسە، یان ناوی شارەکەشی لەگەڵ بنووسە.",
 
-  aiThinking: "لێی تێدەگەین…",
-  aiRead: "ئەم وشەیە لە لیستەکەماندا نەبوو. وامان لێکدایەوە کە مەبەستت {cat} بووە.",
   notHere: "لە {city} نەدۆزرایەوە.",
   butElsewhere: "بەڵام لە شارەکانی تر هەیە:",
 
@@ -215,8 +211,6 @@ const ar: Dict = {
   nothingLong: "لم نجد أي محل بهذا الاسم.",
   nothingHint: "اكتبها بشكل آخر، أو أضف اسم المدينة.",
 
-  aiThinking: "نحاول أن نفهمها…",
-  aiRead: "هذه الكلمة ليست في قائمتنا. فهمنا أنك تقصد {cat}.",
   notHere: "لا يوجد في {city}.",
   butElsewhere: "لكن يوجد في مدن أخرى:",
 
@@ -274,8 +268,6 @@ const en: Dict = {
   nothingLong: "No shop found by that name.",
   nothingHint: "Try wording it differently, or add the city name.",
 
-  aiThinking: "Working out what you mean…",
-  aiRead: "That word was not in our list. We read it as {cat}.",
   notHere: "Nothing in {city}.",
   butElsewhere: "But there is in other cities:",
 
