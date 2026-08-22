@@ -70,6 +70,7 @@ export function htmlLang(locale: Locale): string {
 
 type Dict = {
   brand: string;
+  heroBadge: string;
   tagline: string;
   /** typed out letter by letter in the empty field */
   opening: string;
@@ -123,6 +124,7 @@ type Dict = {
 
 const ku: Dict = {
   brand: "لای حەمە بیدۆزەوە",
+  heroBadge: "هەموو دووکانەکانی کوردستان لە یەک شوێن",
   tagline: "نووسین لە تۆ، گەڕان و دۆزینەوە لە ئێمە",
   opening: "بینووسە، بیدۆزەرەوە",
   hints: [
@@ -179,6 +181,7 @@ const ku: Dict = {
 
 const ar: Dict = {
   brand: "يم حمة تلاقيها",
+  heroBadge: "كل محلات كردستان بمكان واحد",
   tagline: "اكتب أنت، والبحث علينا",
   opening: "اكتبها، وتلاقيها",
   hints: [
@@ -235,6 +238,7 @@ const ar: Dict = {
 
 const en: Dict = {
   brand: "Find It at Lay Hama",
+  heroBadge: "Every shop in Kurdistan, in one place",
   tagline: "You type it, we find it",
   opening: "Type it, find it",
   hints: [

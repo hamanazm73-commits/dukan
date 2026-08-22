@@ -25,22 +25,18 @@ import { loadShops } from "@/lib/shops-repo";
 import { BrandMark } from "./brand-mark";
 
 /*
- * A bazaar at night, behind the search.
+ * Snow on the peaks at sunset, behind the search.
  *
  * The two sister sites open on a photograph and this one opened on flat navy,
  * which is what made it the odd card out on the hub — three doors, one of them
  * plainly less finished than the others.
  *
- * A bazaar rather than a landscape, because that is what this site is for, and
- * this one specifically: the signs in it are in Arabic script. The obvious
- * stock alternatives were a shopping mall, a rail of Western clothes, and a
- * market in Delhi, none of which is anywhere a shopper here has been.
- *
- * It is veiled heavily — the brightest part of the frame is the lit shop dead
- * centre, which is exactly where the mark and the field sit, so the veil is
- * what keeps the gold legible over it.
+ * A bazaar at night was the first answer, and the wrong one: it argued with
+ * the mountains on the other two cards, and the three read as three sites
+ * rather than one family. Hama picked this from a set of eight, and it is the
+ * same country and the same hour as the pictures either side of it.
  */
-const HERO = "https://images.unsplash.com/photo-1758789867803-2db9b0c214fa";
+const HERO = "https://images.unsplash.com/photo-1611507987596-55a4a2aa59e4";
 
 /** Category icons are named in the data; resolve them once. */
 function iconFor(name: string): LucideIcon {
@@ -285,13 +281,12 @@ export function SearchPage() {
         {/* Navy over the photograph, because the brand colour has to survive
             whatever the picture is doing.
 
-            84/72 rather than the 90/78 the sister sites use — this photograph
-            is a night scene and already dark, and at their weight it stopped
-            being a photograph at all. Measured rather than eyeballed: over the
-            brightest pixel anywhere behind the centred column, the gold name
-            comes out at 3.85:1 and the white line under it at 7:1, against the
-            3:1 large text needs. Going lighter still is what breaks the gold,
-            not the white. */}
+            84/72 rather than the 90/78 the sister sites use, and measured
+            rather than eyeballed: against the brightest pixel anywhere behind
+            the centred column — snow catching the last of the sun — the gold
+            name comes out at 4.54:1 and the white line under it at 8.25:1,
+            where large text needs 3:1. Their heavier veil would buy contrast
+            nothing here needs, and spend the photograph to do it. */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#0b1424]/84 via-[#0f1a2c]/72 to-[var(--background)]" />
         {/* a vignette, so the edges fall away and the middle carries the page */}
         <div className="absolute inset-0 [background:radial-gradient(ellipse_100%_65%_at_50%_28%,transparent_25%,rgba(6,12,22,0.72)_100%)]" />
@@ -338,6 +333,20 @@ export function SearchPage() {
             page reads as opening rather than as having always been there.
             Only on the way in: once anyone types, the block is moving to the
             top and a second animation on top of that is noise. */}
+        {/* The badge the other two open with, in the same pill: white at a
+            tenth over the photograph, a gold hairline ring, a sparkle. Three
+            sites that each invent their own masthead stop reading as one
+            family, which is the whole point of the hub. */}
+        {!typed && (
+          <span
+            className="arrive mb-5 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-white ring-1 ring-gold/30 backdrop-blur"
+            style={{ animationDelay: "60ms" }}
+          >
+            <Sparkles className="size-4 text-gold" />
+            {t("heroBadge")}
+          </span>
+        )}
+
         <BrandMark
           className={`${typed ? "size-11" : "arrive-mark size-16 sm:size-20"}`}
         />
@@ -366,10 +375,19 @@ export function SearchPage() {
           </h1>
         </div>
 
+        {/* The gold hairline that marks every masthead across the family. */}
+        {!typed && (
+          <span
+            aria-hidden
+            className="arrive mt-5 block h-px w-24 bg-gradient-to-r from-transparent via-gold to-transparent"
+            style={{ animationDelay: "250ms" }}
+          />
+        )}
+
         {!typed && (
           <p
-            className="arrive mt-3 max-w-xs text-balance text-lg font-normal leading-relaxed text-white/55 sm:max-w-md sm:text-xl"
-            style={{ animationDelay: "300ms" }}
+            className="arrive mt-4 max-w-xs text-balance text-lg font-normal leading-relaxed text-white/70 sm:max-w-md sm:text-xl"
+            style={{ animationDelay: "330ms" }}
           >
             {t("tagline")}
           </p>
