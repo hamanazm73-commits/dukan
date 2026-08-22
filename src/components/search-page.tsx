@@ -23,6 +23,7 @@ import { hoursLabel, isOpenNow } from "@/lib/hours";
 import { mediaSrc } from "@/lib/media";
 import { loadShops } from "@/lib/shops-repo";
 import { BrandMark } from "./brand-mark";
+import { ComingSoonStrip } from "./coming-soon";
 
 /*
  * Snow on the peaks at sunset, behind the search.
@@ -251,6 +252,8 @@ export function SearchPage() {
      * list of answers and the field is a tool above it, not the subject.
      */
     <>
+      <ComingSoonStrip />
+
       {/*
         Fixed, and outside the column.
 

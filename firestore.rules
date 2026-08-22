@@ -68,8 +68,24 @@ service cloud.firestore {
              && (!('closesAt' in d.keys()) || (d.closesAt is string && d.closesAt.size() <= 5));
     }
 
+    /*
+     * One site-wide announcement, at settings/site.
+     *
+     * Public read, because every visitor has to know whether the strip is
+     * flying before the page paints. Admin write, because it changes what
+     * everyone sees. `comingSoon` is the only field, and the size limits stop
+     * this document being used as free storage by an admin account somebody
+     * else got into.
+     */
+    match /settings/site {
+      allow read: if true;
+      allow write: if isAdmin()
+                   && request.resource.data.keys().hasOnly(["comingSoon"])
+                   && request.resource.data.comingSoon is bool;
+    }
+
     // Nothing else in this database is used by this site. Anything that turns
-    // up outside /shops was not put there by the dashboard.
+    // up outside /shops and settings/site was not put there by the dashboard.
     match /{document=**} {
       allow read, write: if false;
     }

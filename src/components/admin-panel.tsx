@@ -25,6 +25,7 @@ import {
   type ShopDraft,
 } from "@/lib/shops-repo";
 import { BrandMark } from "./brand-mark";
+import { ComingSoonCard } from "./coming-soon";
 
 const CITY_KEYS = Object.keys(CITY_NAMES) as CityKey[];
 
@@ -241,6 +242,8 @@ function Dashboard({
           <LogOut className="size-4" />
         </button>
       </header>
+
+      <ComingSoonCard />
 
       {/* Not live means the read fell through to the seed list, and the seed
           list is empty now — so this says the database is unreachable rather

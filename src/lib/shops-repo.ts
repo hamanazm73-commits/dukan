@@ -5,9 +5,11 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   orderBy,
   query,
+  setDoc,
   updateDoc,
 } from "firebase/firestore";
 import { SHOPS, type Shop } from "./data";
@@ -115,4 +117,45 @@ export async function deleteShop(id: string): Promise<void> {
   const db = getDbOrNull();
   if (!db) throw new Error("Firebase is not configured");
   await deleteDoc(doc(db, SHOPS_COLLECTION, id));
+}
+
+/* ----------------------------- Site settings ---------------------------- */
+
+/**
+ * Whether to fly the "still being worked on" strip across the top.
+ *
+ * The hotels site has had one since it opened and the homes site now does too.
+ * It does a job an empty result cannot: somebody who searches and finds three
+ * shops reads either "this is all they have" or "they are still adding", and
+ * only one of those brings them back.
+ *
+ * Its own document rather than a field on anything else, because nothing else
+ * here is site-wide. Absent means off — this site is live and carrying real
+ * shops, so the owner turns it on when they want it.
+ *
+ * Unlike the shops, a failed read here is not worth surfacing: the honest
+ * fallback for "is there an announcement" is no.
+ */
+const SETTINGS_DOC = "site";
+const SETTINGS_COLLECTION = "settings";
+
+export async function loadComingSoon(): Promise<boolean> {
+  const db = getDbOrNull();
+  if (!db) return false;
+  try {
+    const snap = await getDoc(doc(db, SETTINGS_COLLECTION, SETTINGS_DOC));
+    return snap.exists() && snap.data().comingSoon === true;
+  } catch {
+    return false;
+  }
+}
+
+export async function saveComingSoon(on: boolean): Promise<void> {
+  const db = getDbOrNull();
+  if (!db) throw new Error("firebase-not-configured");
+  await setDoc(
+    doc(db, SETTINGS_COLLECTION, SETTINGS_DOC),
+    { comingSoon: on },
+    { merge: true },
+  );
 }
