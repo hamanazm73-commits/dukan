@@ -24,6 +24,24 @@ import { mediaSrc } from "@/lib/media";
 import { loadShops } from "@/lib/shops-repo";
 import { BrandMark } from "./brand-mark";
 
+/*
+ * A bazaar at night, behind the search.
+ *
+ * The two sister sites open on a photograph and this one opened on flat navy,
+ * which is what made it the odd card out on the hub — three doors, one of them
+ * plainly less finished than the others.
+ *
+ * A bazaar rather than a landscape, because that is what this site is for, and
+ * this one specifically: the signs in it are in Arabic script. The obvious
+ * stock alternatives were a shopping mall, a rail of Western clothes, and a
+ * market in Delhi, none of which is anywhere a shopper here has been.
+ *
+ * It is veiled heavily — the brightest part of the frame is the lit shop dead
+ * centre, which is exactly where the mark and the field sit, so the veil is
+ * what keeps the gold legible over it.
+ */
+const HERO = "https://images.unsplash.com/photo-1758789867803-2db9b0c214fa";
+
 /** Category icons are named in the data; resolve them once. */
 function iconFor(name: string): LucideIcon {
   const set = Icons as unknown as Record<string, LucideIcon>;
@@ -236,6 +254,49 @@ export function SearchPage() {
      * the centre and goes to the top, because from then on the page is a
      * list of answers and the field is a tool above it, not the subject.
      */
+    <>
+      {/*
+        Fixed, and outside the column.
+
+        `main` is capped at max-w-7xl with padding, so a layer inside it stops
+        short of the screen edges — the photograph would have sat in a box with
+        navy either side of it. Fixed also means it holds still while the
+        results scroll over it, which is what a backdrop should do.
+
+        It dims once anyone types. From that moment the page is a list to read
+        rather than a door to walk through, and a photograph behind small text
+        is only something to see past.
+      */}
+      <div
+        aria-hidden
+        className={`pointer-events-none fixed inset-x-0 top-0 -z-10 h-[80vh] transition-opacity duration-700 ${
+          typed ? "opacity-40" : "opacity-100"
+        }`}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`${HERO}?w=1600&q=78`}
+          srcSet={`${HERO}?w=768&q=70 768w, ${HERO}?w=1280&q=76 1280w, ${HERO}?w=1920&q=78 1920w`}
+          sizes="100vw"
+          alt=""
+          fetchPriority="high"
+          className="size-full object-cover"
+        />
+        {/* Navy over the photograph, because the brand colour has to survive
+            whatever the picture is doing.
+
+            84/72 rather than the 90/78 the sister sites use — this photograph
+            is a night scene and already dark, and at their weight it stopped
+            being a photograph at all. Measured rather than eyeballed: over the
+            brightest pixel anywhere behind the centred column, the gold name
+            comes out at 3.85:1 and the white line under it at 7:1, against the
+            3:1 large text needs. Going lighter still is what breaks the gold,
+            not the white. */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0b1424]/84 via-[#0f1a2c]/72 to-[var(--background)]" />
+        {/* a vignette, so the edges fall away and the middle carries the page */}
+        <div className="absolute inset-0 [background:radial-gradient(ellipse_100%_65%_at_50%_28%,transparent_25%,rgba(6,12,22,0.72)_100%)]" />
+      </div>
+
     <main
       className={`relative mx-auto flex min-h-dvh w-full max-w-7xl flex-col px-4 pb-16 transition-all duration-500 sm:px-6 ${
         typed ? "justify-start" : "justify-center pb-[26vh]"
@@ -524,6 +585,7 @@ export function SearchPage() {
       )}
 
     </main>
+    </>
   );
 }
 
