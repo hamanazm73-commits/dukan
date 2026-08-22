@@ -314,7 +314,12 @@ export function SearchPage() {
         {!typed && (
           <span
             aria-hidden
-            className="arrive mt-5 block h-px w-24 bg-gradient-to-r from-transparent via-gold to-transparent"
+            /* Wider than the sister sites keep theirs. The name above it is
+               Ruqaa at 4.2rem and runs most of the column; a 96px rule under
+               that reads as a dash rather than a rule. It grows with the
+               screen so it stays in proportion to the name rather than to
+               nothing. */
+            className="arrive mt-5 block h-px w-48 bg-gradient-to-r from-transparent via-gold to-transparent sm:w-72"
             style={{ animationDelay: "250ms" }}
           />
         )}
